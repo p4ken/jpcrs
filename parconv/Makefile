@@ -1,6 +1,6 @@
-all: TKY2JGD.rs touhokutaiheiyouoki2011.rs
+all: TKY2JGD.in touhokutaiheiyouoki2011.in
 
-%.rs: %.par
+%.in: %.par
 	cargo run $*
 
 %.par: %.zip
