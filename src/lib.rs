@@ -1,5 +1,4 @@
 mod island;
-mod meshcode;
 mod par;
 mod patchjgd;
 mod tky2jgd;
@@ -56,7 +55,10 @@ impl<T> JGD2000<T> {
     // GRS80楕円体
 
     /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2011`] へ変換する
-    pub fn to_jgd2011() {}
+    pub fn to_jgd2011() {
+        // 地震時地殻変動に伴う座標値の変化を補正するソフトウェア“PatchJGD”
+        // https://www.jstage.jst.go.jp/article/sokuchi/55/4/55_4_355/_pdf/-char/ja
+    }
 
     /// `tky2jgd.par` を用いて [`TokyoDatum`] へ逆変換する
     pub fn to_tokyo() {}
