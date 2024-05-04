@@ -1,3 +1,6 @@
+[workspace]
+members = ["parconv"]
+
 [package]
 name = "jpcrs"
 version = "0.1.0"
