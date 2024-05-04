@@ -1,23 +1,9 @@
-use std::{
-    collections::BTreeSet,
-    env,
-    fmt::Display,
-    fs::File,
-    io::{BufRead, BufReader, BufWriter, Write},
-    str::FromStr,
-};
+use std::{collections::BTreeSet, fmt::Display, io, str::FromStr};
 
 use anyhow::{ensure, Context};
 
 fn main() {
-    let stem = env::args().nth(1).expect("argument needed");
-    let par_path = format!("{stem}.par");
-    let rs_path = format!("{stem}.in");
-
-    let mut rs_file = BufWriter::new(File::create(rs_path).unwrap());
-
-    let par_file = BufReader::new(File::open(par_path).unwrap());
-    par_file
+    io::stdin()
         .lines()
         .map(Result::unwrap)
         .skip_while(|line| line != "MeshCode   dB(sec)   dL(sec)")
@@ -25,7 +11,7 @@ fn main() {
         .map(|line| line.parse().unwrap())
         .collect::<BTreeSet<Record>>()
         .into_iter()
-        .for_each(|record| writeln!(rs_file, "{}", record).unwrap());
+        .for_each(|record| println!("{}", record));
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -40,6 +26,7 @@ impl FromStr for Record {
             *line = rest;
             number.trim_start().parse().map_err(Into::into)
         }
+
         // 一次メッシュ
         let mesh1_lat = parse_until(&mut line, 2)?;
         let mesh1_lon = parse_until(&mut line, 2).unwrap();
