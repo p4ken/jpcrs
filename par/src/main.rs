@@ -1,6 +1,7 @@
 use std::{
     collections::BTreeSet,
     convert::Infallible,
+    fmt::Display,
     io::{self, BufRead, Write},
     str::{self, FromStr},
 };
@@ -26,8 +27,12 @@ fn main() {
         })
         .collect::<BTreeSet<Record>>() // sort
         .into_iter()
-        .try_for_each(|record| io::stdout().write_all(&record.to_be_bytes()))
-        .expect("stdout must be valid");
+        .for_each(|record| {
+            io::stdout()
+                .write_all(&record.to_be_bytes())
+                .expect("stdout must be valid")
+        })
+    // .for_each(|record| println!("{}", record))
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -78,6 +83,11 @@ impl FromStr for Record {
         let d_lon_us = parse_diff(&mut line).expect("dL(sec)");
 
         Ok(Record(grid_lat, grid_lon, d_lat_us, d_lon_us))
+    }
+}
+impl Display for Record {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:04}{:04}{:09}{:09}", self.0, self.1, self.2, self.3)
     }
 }
 impl Record {

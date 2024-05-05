@@ -1,5 +1,5 @@
 [package]
-name = "parconv"
+name = "par"
 edition = "2021"
 publish = false
 

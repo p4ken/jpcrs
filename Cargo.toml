@@ -1,5 +1,5 @@
 [workspace]
-members = ["parconv"]
+members = ["par"]
 
 [package]
 name = "jpcrs"
