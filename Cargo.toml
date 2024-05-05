@@ -8,4 +8,9 @@ edition = "2021"
 description = "Transform coordinate systems used in Japan"
 keywords = ["geospatial", "jgd"]
 
+[features]
+default = ["geo-types"]       # tmp
+geo-types = ["dep:geo-types"]
+
 [dependencies]
+geo-types = { version = "0.7.13", optional = true }
