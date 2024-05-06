@@ -73,8 +73,9 @@ impl FromStr for Record {
             *line = line.strip_prefix(".").context("expected decimal point")?;
             let d_decimal = parse_number(line, 5)?;
 
-            // マイクロ秒表現
-            (d_integer * 1_000_000 + d_decimal * 10)
+            // 整数表現
+            let sign = 1 - (d_integer < 0) as i64 * 2;
+            (d_integer * 100_000 + d_decimal * sign)
                 .try_into()
                 .context("diff overflowed")
         }
