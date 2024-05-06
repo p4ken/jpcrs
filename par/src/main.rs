@@ -22,17 +22,18 @@ fn main() {
         .map(|line| {
             str::from_utf8(&line)
                 .expect("body must be ASCII")
-                .parse()
+                .parse::<Record>()
                 .unwrap()
         })
-        .collect::<BTreeSet<Record>>() // sort
+        // sort all records, since lines 378632 onwards of TKY2JGD.par are not sorted
+        .collect::<BTreeSet<_>>()
         .into_iter()
+        .inspect(|record| eprintln!("{}", record))
         .for_each(|record| {
             io::stdout()
-                .write_all(&record.to_be_bytes())
+                .write_all(&record.to_bytes())
                 .expect("stdout must be valid")
         })
-    // .for_each(|record| println!("{}", record))
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -59,7 +60,7 @@ impl FromStr for Record {
         let (mesh2_lat, mesh2_lon) = parse_meshcode(&mut line, 1).expect("2nd mesh");
         let (mesh3_lat, mesh3_lon) = parse_meshcode(&mut line, 1).expect("3rd mesh");
 
-        // 0度の三次メッシュを0とする連番のグリッド番号
+        // Serial number of 3rd mesh grids starting from BL(0,0)
         fn to_grid(mesh1: i64, mesh2: i64, mesh3: i64) -> anyhow::Result<i16> {
             (mesh1 * 80 + mesh2 * 10 + mesh3)
                 .try_into()
@@ -73,7 +74,7 @@ impl FromStr for Record {
             *line = line.strip_prefix(".").context("expected decimal point")?;
             let d_decimal = parse_number(line, 5)?;
 
-            // 整数表現
+            // Remove decimal point (.)
             let sign = 1 - (d_integer < 0) as i64 * 2;
             (d_integer * 100_000 + d_decimal * sign)
                 .try_into()
@@ -88,17 +89,18 @@ impl FromStr for Record {
 }
 impl Display for Record {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:04}{:04}{:09}{:09}", self.0, self.1, self.2, self.3)
+        let s = format!("{:04},{:04},{:08},{:08}", self.0, self.1, self.2, self.3);
+        assert_eq!(s.len(), 27, "{}", s);
+        f.write_str(&s)
     }
 }
 impl Record {
-    fn to_be_bytes(&self) -> Vec<u8> {
-        self.0
-            .to_be_bytes()
-            .into_iter()
-            .chain(self.1.to_be_bytes().into_iter())
-            .chain(self.2.to_be_bytes().into_iter())
-            .chain(self.3.to_be_bytes().into_iter())
-            .collect()
+    fn to_bytes(&self) -> [u8; 12] {
+        let mut buf = [0; 12];
+        buf[0..2].copy_from_slice(&self.0.to_le_bytes());
+        buf[2..4].copy_from_slice(&self.1.to_le_bytes());
+        buf[4..8].copy_from_slice(&self.2.to_le_bytes());
+        buf[8..12].copy_from_slice(&self.3.to_le_bytes());
+        buf
     }
 }
