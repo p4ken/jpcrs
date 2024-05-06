@@ -31,7 +31,7 @@ fn main() {
         .inspect(|record| eprintln!("{}", record))
         .for_each(|record| {
             io::stdout()
-                .write_all(&record.to_bytes())
+                .write_all(&record.to_binary())
                 .expect("stdout must be valid")
         })
 }
@@ -76,7 +76,7 @@ impl FromStr for Record {
 
             // Remove decimal point (.)
             let sign = 1 - (d_integer < 0) as i64 * 2;
-            (d_integer * 100_000 + d_decimal * sign)
+            (d_integer * 1_000_000 + d_decimal * 10 * sign)
                 .try_into()
                 .context("diff overflowed")
         }
@@ -89,13 +89,13 @@ impl FromStr for Record {
 }
 impl Display for Record {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = format!("{:04},{:04},{:08},{:08}", self.0, self.1, self.2, self.3);
-        assert_eq!(s.len(), 27, "{}", s);
+        let s = format!("{:04},{:04},{:09},{:09}", self.0, self.1, self.2, self.3);
+        assert_eq!(s.len(), 29, "{}", s);
         f.write_str(&s)
     }
 }
 impl Record {
-    fn to_bytes(&self) -> [u8; 12] {
+    fn to_binary(&self) -> [u8; 12] {
         let mut buf = [0; 12];
         buf[0..2].copy_from_slice(&self.0.to_le_bytes());
         buf[2..4].copy_from_slice(&self.1.to_le_bytes());
