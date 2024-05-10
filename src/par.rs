@@ -1,13 +1,15 @@
-//! Parameters grid
+//! Parameters grid.
 
-// rlib: +19MB
-// pub const TKY2JGD_FLAT: &[u8] = include_bytes!("../par/TKY2JGD.in");
+use crate::coord_::{Geodetic, MilliSecond, NanoSecond};
 
-// rlib: +4.5MB
 const TKY2JGD: Table = Table(include_bytes!("../par/TKY2JGD.in"));
 
 struct Table(pub &'static [u8]);
-impl Table {}
+impl Table {
+    fn get(key: NanoSecond) -> Option<NanoSecond> {
+        None
+    }
+}
 
 #[derive(Debug)]
 struct Record {
@@ -24,6 +26,12 @@ impl Record {
             d_lat_us: i32::from_le_bytes(bin[4..8].try_into().unwrap()),
             d_lon_us: i32::from_le_bytes(bin[8..12].try_into().unwrap()),
         }
+    }
+    fn to_key(&self) -> MilliSecond {
+        MilliSecond(Geodetic {
+            lat: i32::from(self.grid_lat) * 30 * 1000,
+            lon: i32::from(self.grid_lon) * 45 * 1000,
+        })
     }
 }
 

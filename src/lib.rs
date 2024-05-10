@@ -1,11 +1,15 @@
-mod bl;
+use coord::LatLon;
+
+mod coord;
+mod coord_;
 mod island;
+mod latlonjp;
 mod par;
 mod patchjgd;
 mod tky2jgd;
 
 /// 日本測地系 Tokyo Datum
-pub struct TokyoDatum<T>(T);
+pub struct TokyoDatum<T>(LatLon<T>);
 
 /// 日本測地系 Tokyo97
 pub struct Tokyo97<T>(T);
