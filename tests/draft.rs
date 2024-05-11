@@ -1,4 +1,7 @@
-use latlonjp::{Datum, Degree, Jgd2011, LatLon, TokyoDatum, Transform, Unit};
+use datumjp;
+use latlonjp::{
+    Datum, Degree, Jgd2011, LatLon, TokyoDatum, Transform, Unit, TOKYO, TOKYO_TO_JGD2000,
+};
 
 fn api_elements() {
     let bl = geo_types::Point::new(2.0, 1.0);
@@ -33,6 +36,10 @@ fn api_elements() {
     let tokyo = latlonjp::tokyo(degree);
 
     let transform = Transform::from_tokyo().to_jgd2000().to_jgd2011();
+    let transform = TOKYO.to_jgd2000().to_jgd2011();
+    let transform = latlonjp::tokyo_to_jgd2000().to_jgd2011();
+    let transform = TOKYO_TO_JGD2000.to_jgd2011();
+    let transform = datumjp::tky2jgd().tohokutaiheiyouoki().inverse();
 
     let jgd2011 = tokyo.to_jgd2000().to_jgd2011();
     let jgd2011 = tokyo.to_jgd2011();
@@ -43,16 +50,11 @@ fn api_elements() {
     let LatLon(lat, lon) = jgd2011.degree();
 
     let Degree { lat, lon } = transform.transform(degree);
-    let LatLon(lat, lon) = transform.degree(bl);
+    let LatLon(lat, lon) = transform.degree(bl); // only for degree -> degree
     let LatLon(lat, lon) = transform.degree();
 }
 
 fn api_usage() {
-    let Degree { lat, lon } = TokyoDatum::new(Degree { lat: 1.0, lon: 2.0 })
-        .to_jgd2000()
-        .to_jgd2011()
-        .degree();
-
     let LatLon(lat, lon) = TokyoDatum::with_degree(LatLon(1.0, 2.0))
         .to_jgd2000()
         .to_jgd2011()
@@ -63,21 +65,11 @@ fn api_usage() {
         .to_jgd2011() // Transform<Jgd2011<Degree>>
         .degree();
 
-    let Degree { lat, lon } = Transform::from_tokyo() // Transform<Tokyo>
-        .to_jgd2000() // Transform<Jgd2000>
-        .to_jgd2011() // Transform<Jgd2011>
-        .transform(Degree { lat: 1.0, lon: 2.0 });
-
     let LatLon(lat, lon) = Transform::degree(LatLon(1.0, 2.0))
         .from_tokyo()
         .to_jgd2000()
         .to_jgd2011()
-        .degree();
-
-    let LatLon(lat, lon) = Transform::from_tokyo()
-        .to_jgd2000()
-        .to_jgd2011()
-        .degree(LatLon(1.0, 2.0));
+        .degree(); // robust
 
     // let p = geo_types::Point::new(2.0, 1.0);
     // let _ = TokyoDatum::with_degree(p)
