@@ -1,12 +1,12 @@
-[workspace]
-members = ["par"]
-
 [package]
-name = "jpcrs"
+name = "latlonjp"
 version = "0.1.0"
 edition = "2021"
-description = "Transform coordinate systems used in Japan"
+description = "Transform between coordinate systems in Japan"
 keywords = ["geospatial", "jgd"]
+
+[workspace]
+members = ["par"]
 
 [features]
 # default = ["geo-types"]       # tmp
@@ -14,3 +14,6 @@ geo-types = ["dep:geo-types"]
 
 [dependencies]
 geo-types = { version = "0.7.13", optional = true }
+
+[dev-dependencies]
+geo-types = "0.7.13"

@@ -1,87 +1,35 @@
-use std::ops::Mul;
+pub struct Degree(f64);
+pub struct MilliSecond(i32);
+pub struct NanoSecond(i64);
 
-/// Latitude and longitude in degrees.
-pub struct Degree(Geodetic<f64>); // 0.14ns (f32: 77ms)
-impl From<MilliSecond> for Degree {
-    fn from(ms: MilliSecond) -> Self {
-        todo!()
-    }
-}
-impl From<NanoSecond> for Degree {
-    fn from(value: NanoSecond) -> Self {
-        todo!()
-    }
+#[derive(Debug, Clone, Copy)]
+pub struct LatLon<T> {
+    lat: T,
+    lon: T,
 }
 
-// pub struct MicroDegree(Geodetic<i32>); // 8% 22cm
-
-/// Latitude and longitude in milli seconds.
-pub struct MilliSecond(pub(crate) Geodetic<i32>); // 30% 60mm
-
-// pub struct MicroSecond(Geodetic<i64>); // 0% 0.06mm
-
-/// Latitude and longitude in nano seconds.
-pub struct NanoSecond(pub(crate) Geodetic<i64>); // 0.007% 0mm
-pub struct NanoSecond_ {
-    pub lat: i64,
-    pub lon: i64,
+impl<T> LatLon<T> {
+    pub fn new(lat: T, lon: T) {}
 }
 
-// pub struct Degree {
-//     int: i16,
-//     nanos: i32,
+impl LatLon<NanoSecond> {
+    pub fn from_degree<T: Into<f64>>(lat: T, lon: T) {}
+    pub fn from_milli_seconds<T: Into<i32>>(lat: T, lon: T) {}
+    pub fn from_nano_seconds<T: Into<i64>>(lat: T, lon: T) {}
+
+    // ミスを誘発するのでbad
+    pub fn to_jgd2000() {}
+}
+
+// pub trait ToJgd2000 {
+//     fn to_jgd2000();
+// }
+// impl ToJgd2000 for LatLon<NanoSecond> {
+//     // ミスを誘発するのでbad
+//     fn to_jgd2000() {}
 // }
 
-// NanoSecondの方がよい
-// pub struct Second {
-//     second: i32, // 0.03%
-//     micro: i32,  // 0.04%
-// }
+pub fn to_jgd2000() {}
 
-/// Latitude and longitude.
-#[derive(Debug)]
-pub struct Geodetic<T> {
-    /// Latitude
-    pub lat: T,
-
-    /// Longitude
-    pub lon: T,
-}
-// impl<T: Mul<Output = T> + Copy> Mul<T> for Geodetic<T> {
-//     type Output = Self;
-//     fn mul(self, rhs: T) -> Self::Output {
-//         Self {
-//             lat: self.lat * rhs,
-//             lon: self.lon * rhs,
-//         }
-//     }
-// }
-#[cfg(feature = "geo-types")]
-impl From<geo_types::Coord> for Geodetic<Degree> {
-    fn from(coord: geo_types::Coord) -> Self {
-        geo_types::Point::new(1.0, 1.0);
-        todo!()
-    }
-}
-
-/// Latitude and longitude.
-#[derive(Debug)]
-pub struct LatLon {
-    lat_us: i64,
-    lon_us: i64,
-}
-impl LatLon {
-    fn from_millis(lat_ms: i32, lon_ms: i32) {}
-    fn millis(&self) -> (i32, i32) {
-        todo!()
-    }
-    fn from_degrees(lat_d: f64, lon_d: f64) {}
-    fn degrees(&self) -> (f64, f64) {
-        todo!()
-    }
-}
-
-pub struct ECEF {}
-impl ECEF {
-    pub fn to_geodetic() {}
-}
+// LatLonはf64 degree固定の代わりに
+// par関連はus単位、離島はcm単位の変化量を返してあげる、とか
