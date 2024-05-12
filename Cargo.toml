@@ -1,5 +1,5 @@
 [package]
-name = "latlonjp"
+name = "datumjp"
 version = "0.1.0"
 edition = "2021"
 description = "Transform between coordinate systems in Japan"
