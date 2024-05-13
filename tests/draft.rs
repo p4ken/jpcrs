@@ -78,7 +78,15 @@ fn api_usage() {
 
     let JGD2011 { lat, lon } = TokyoDatum { lat: 1.0, lon: 2.0 }.to_jgd2000().to_jgd2011();
 
-    let LatLon(lat, lon) = TokyoDatum(LatLon(1.0, 2.0)).to_jgd2000().to_jgd2011().0;
+    let LatLon(lat, lon) = TokyoDatum(LatLon(1.0, 2.0))
+        .to_jgd2000()
+        .to_jgd2011()
+        .latlon();
+
+    let Degree { lat, lon } = TokyoDatum(Degree { lat: 1.0, lon: 2.0 })
+        .to_jgd2000()
+        .to_jgd2011()
+        .degree();
 
     let LatLon(lat, lon) = Transform::from_tokyo(LatLon(1.0, 2.0))
         .to_jgd2000()
