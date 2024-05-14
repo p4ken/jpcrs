@@ -1,8 +1,8 @@
 [package]
-name = "datumjp"
+name = "jpcrs"
 version = "0.1.0"
 edition = "2021"
-description = "Transform between coordinate systems in Japan"
+description = "Transform coordinate reference systems in Japan"
 keywords = ["geospatial", "jgd"]
 
 [workspace]
