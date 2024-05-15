@@ -92,6 +92,21 @@ impl JGD2011 {
         (self.lon, self.lat)
     }
 
+    pub fn latlon(self) -> LatLon {
+        todo!()
+    }
+
     /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2000`] へ逆変換する
     pub fn to_jgd2000(self) {}
+}
+
+pub struct LatLon(pub Degree, pub Degree);
+impl From<LatLon> for XY {
+    fn from(bl: LatLon) -> Self {
+        todo!()
+    }
+}
+
+pub fn from_tokyo(p: impl Into<XY>) -> TokyoDatum {
+    todo!()
 }

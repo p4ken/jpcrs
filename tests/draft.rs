@@ -10,7 +10,7 @@
 // };
 
 use geo_types::Point;
-use jpcrs::{TokyoDatum, JGD2011};
+use jpcrs::{LatLon, TokyoDatum, JGD2011};
 
 // fn api_elements() {
 //     let bl = geo_types::Point::new(2.0, 1.0);
@@ -116,12 +116,12 @@ fn api_usage() {
     //     .to_jgd2011()
     //     .transform(LatLon(1.0, 2.0));
 
-    // let LatLon(lat, lon) = jpcrs::from_tokyo(LatLon(1.0, 2.0))
-    //     .to_jgd2000()
-    //     .to_jgd2011()
-    //     .latlon();
+    let LatLon(lat, lon) = jpcrs::from_tokyo(LatLon(1.0, 2.0))
+        .to_jgd2000()
+        .to_jgd2011()
+        .latlon();
 
     let p = Point::new(2.0, 1.0);
     let Point(_) = TokyoDatum::with_xy(p).to_jgd2000().to_jgd2011().xy().into();
-    // let Point(_) = jpcrs::from_tokyo(p).to_jgd2000().to_jgd2011().xy().into();
+    let Point(_) = jpcrs::from_tokyo(p).to_jgd2000().to_jgd2011().xy().into();
 }
