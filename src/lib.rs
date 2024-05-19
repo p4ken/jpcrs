@@ -34,7 +34,9 @@ impl TokyoDatum {
 /// 日本測地系 Tokyo97
 pub struct Tokyo97<T>(T);
 
-/// 世界測地系 JGD2000
+/// Japanese Geodetic Datum 2000
+///
+/// 世界測地系 (JGD2000)
 pub struct JGD2000 {
     pub lat: Degree,
     pub lon: Degree,
