@@ -14,7 +14,8 @@ geo-types = ["dep:geo-types"]
 
 [dependencies]
 geo-types = { version = "0.7.13", optional = true }
-proj4rs = "0.1.3"
 
 [dev-dependencies]
+anyhow = { version = "1.0.82", features = ["backtrace"] }
 geo-types = "0.7.13"
+proj4rs = { version = "0.1.3", path = "../../Downloads/proj4rs", default-features = false }
