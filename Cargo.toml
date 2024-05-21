@@ -2,19 +2,16 @@
 name = "jpcrs"
 version = "0.1.0"
 edition = "2021"
-description = "Transform coordinate reference systems in Japan"
+description = "Transform coordinate systems used in Japan"
 keywords = ["geospatial", "jgd"]
 
 [workspace]
 members = ["par"]
 
 [features]
-# default = ["geo-types"]       # tmp
-geo-types = ["dep:geo-types"]
+tky2jgd = []
 
 [dependencies]
-geo-types = { version = "0.7.13", optional = true }
-proj4rs = "0.1.3"
 
 [dev-dependencies]
 geo-types = "0.7.13"
