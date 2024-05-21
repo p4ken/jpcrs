@@ -1,3 +1,5 @@
+mod par;
+
 /// 度
 pub type Degree = f64;
 
