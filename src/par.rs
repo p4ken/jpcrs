@@ -1,6 +1,3 @@
-// to use slice::from_raw_parts()
-#![cfg(target_endian = "little")]
-
 //! Parameters grid.
 
 use std::{mem, slice};
@@ -17,6 +14,9 @@ impl Table {
     const fn records(&self) -> &[Record] {
         let data = self.bytes.as_ptr() as _;
         let len = self.bytes.len() / mem::size_of::<Record>();
+
+        #[cfg(not(target_endian = "little"))]
+        compile_error!("target must be little endian");
         unsafe { slice::from_raw_parts(data, len) }
     }
 }
@@ -46,6 +46,7 @@ mod tests {
     fn table_records() {
         let records = TKY2JGD.records();
         assert_eq!(records.len(), 392323);
+
         let r = records.last().unwrap();
         assert_eq!(r.grid_lat, 5463);
         assert_eq!(r.grid_lon, 3356);
