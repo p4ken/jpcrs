@@ -8,9 +8,8 @@ on:
     inputs:
       bump:
         type: choice
-        default: ''
         options:
-          - ''
+          - \
           - patch
           - minor
 
