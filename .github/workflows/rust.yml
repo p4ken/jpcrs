@@ -9,7 +9,7 @@ on:
       bump:
         type: choice
         options:
-          - ""
+          - ''
           - patch
           - minor
 
@@ -36,7 +36,7 @@ jobs:
       run: |
         git config user.name "GitHub Actions"
         git config user.email "<>"
-        cargo set-version --bump ${{ inputs.bump }}
+        cargo set-version --package jgd --bump ${{ inputs.bump }}
         git commit --all -m "v${{ inputs.bump }}"
         git tag "v${{ inputs.bump }}"
     - name: Publish
