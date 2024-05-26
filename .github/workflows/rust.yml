@@ -8,6 +8,7 @@ on:
     inputs:
       bump:
         type: choice
+        default: none
         options:
           - none
           - patch
@@ -25,7 +26,7 @@ jobs:
       run: make
 
   publish:
-    if: "${{ github.event.inputs.bump != 'none' }}"
+    if: "${{ inputs.bump != 'none' }}"
     needs: build 
     runs-on: ubuntu-latest
     steps:
