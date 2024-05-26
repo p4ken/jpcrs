@@ -27,7 +27,7 @@ jobs:
 
   publish:
     if: "${{ inputs.bump != 'none' }}"
-    needs: build 
+    # needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
