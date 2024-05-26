@@ -1,7 +1,8 @@
+.PHONY: all
 all: TKY2JGD.in touhokutaiheiyouoki2011.in
 
 %.in: %.par
-	cargo run < $*.par > $*.in
+	cargo run --package conv < $*.par > $*.in
 
 %.par: %.zip
 	unzip -p $*.zip > $@

@@ -2,14 +2,16 @@
 name = "jgd"
 version = "0.1.0"
 edition = "2021"
-description = "Transform coordinate systems used in Japan"
-keywords = ["geospatial", "jgd"]
+description = "Transform geodetic coordinates used in Japan"
+keywords = ["TKY2JGD", "PatchJGD", "JGD2000", "JGD2011"]
 
 [workspace]
-members = ["par"]
+members = ["par/conv"]
 
 [features]
+default = ["tky2jgd", "touhokutaiheiyouoki2011"]
 tky2jgd = []
+touhokutaiheiyouoki2011 = []
 
 [dependencies]
 
