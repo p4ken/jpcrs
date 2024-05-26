@@ -8,9 +8,9 @@ on:
     inputs:
       bump:
         type: choice
-        default: none
+        default: ''
         options:
-          - none
+          - ''
           - patch
           - minor
 
@@ -26,7 +26,7 @@ jobs:
       run: make
 
   publish:
-    if: "${{ inputs.bump != 'none' }}"
+    if: "${{ inputs.bump }}"
     # needs: build
     runs-on: ubuntu-latest
     steps:
