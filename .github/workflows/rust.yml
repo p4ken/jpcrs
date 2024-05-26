@@ -8,9 +8,10 @@ on:
     inputs:
       bump:
         required: false
-        # default: ''
         type: choice
         options:
+          - none
+          - alpha
           - patch
           - minor
 
@@ -26,11 +27,16 @@ jobs:
       run: make
 
   publish:
-    if: "${{ github.event.inputs.bump != '' }}"
+    if: "${{ inputs.bump != 'none' }}"
+    needs: build 
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Publish
       env:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-      run: echo $CARGO_REGISTRY_TOKEN
+      run: |
+        cargo install cargo-edit
+        cargo set-version --bump ${{ inputs.bump }}
+        git commit --all -m "v${{ inputs.bump }}"
+        git tag "v${{ inputs.bump }}"
