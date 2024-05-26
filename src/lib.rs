@@ -1,6 +1,7 @@
 mod grid;
-#[cfg(feature = "tky2jgd")]
-mod tky2jgd;
+mod par;
+
+pub use grid::TKY2JGD;
 
 /// 度
 pub type Degree = f64;

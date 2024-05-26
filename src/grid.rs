@@ -1,34 +1,16 @@
 //! Parameters grid.
 
-use std::{mem, slice};
+use crate::{par, LatLon};
 
-use crate::LatLon;
+#[cfg(feature = "tky2jgd")]
+pub const TKY2JGD: Grid = par::TKY2JGD.to_grid();
 
-#[repr(align(4))] // <- this is why the bytes wrapped with the struct.
-pub struct Bin<const N: usize>(pub [u8; N]);
-impl<const N: usize> Bin<N> {
-    pub const fn to_grid(&self) -> Grid {
-        assert!(isize::MAX as usize > N);
-        let data = self.0.as_ptr() as *const Dot;
-        let len = self.0.len() / mem::size_of::<Dot>();
-
-        #[cfg(not(target_endian = "little"))]
-        compile_error!("compile target must be little endian");
-        // SAFETY:
-        // `data` is aligned as same as `Dot`. It outlives for the lifetime of `self`.
-        // `len * size_of::<Recod>()` always within length of `data` and smaller than `isize::MAX`.
-        // Returned value used as immutable.
-        let dots = unsafe { slice::from_raw_parts(data, len) };
-
-        Grid::new(dots)
-    }
-}
-
+#[derive(Debug)]
 pub struct Grid<'a> {
-    pub(crate) dots: &'a [Dot],
+    dots: &'a [Dot],
 }
 impl<'a> Grid<'a> {
-    const fn new(dots: &'a [Dot]) -> Self {
+    pub const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
     pub fn interpolate(&self, bl: LatLon) -> LatLon {
@@ -42,10 +24,8 @@ impl<'a> Grid<'a> {
 #[derive(Debug)]
 #[repr(C)]
 pub struct Dot {
-    pub(crate) grid_lat: i16,
-    pub(crate) grid_lon: i16,
-    pub(crate) d_lat_us: i32,
-    pub(crate) d_lon_us: i32,
+    index: Mesh3Index,
+    shift: MicroSecond,
 }
 impl Dot {
     // fn to_key(&self) -> MilliSecond {
@@ -56,9 +36,36 @@ impl Dot {
     // }
 }
 
+#[derive(Debug)]
+#[repr(C)]
+struct Mesh3Index {
+    lat: i16,
+    lon: i16,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+struct MicroSecond {
+    lat: i32,
+    lon: i32,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(feature = "tky2jgd")]
+    #[test]
+    fn tky2jgd_grid() {
+        let records = TKY2JGD.dots;
+        assert_eq!(records.len(), 392323);
+
+        let r = records.last().unwrap();
+        assert_eq!(r.index.lat, 5463);
+        assert_eq!(r.index.lon, 3356);
+        assert_eq!(r.shift.lat, 7875320);
+        assert_eq!(r.shift.lon, -13995610);
+    }
 
     #[test]
     fn grid_interpolate() {

@@ -61,13 +61,13 @@ impl FromStr for Record {
         let (mesh3_lat, mesh3_lon) = parse_meshcode(&mut line, 1).expect("3rd mesh");
 
         // Serial number of 3rd mesh grids starting from BL(0,0)
-        fn to_grid(mesh1: i64, mesh2: i64, mesh3: i64) -> anyhow::Result<i16> {
+        fn to_grid_index(mesh1: i64, mesh2: i64, mesh3: i64) -> anyhow::Result<i16> {
             (mesh1 * 80 + mesh2 * 10 + mesh3)
                 .try_into()
                 .context("grid overflowed")
         }
-        let grid_lat = to_grid(mesh1_lat, mesh2_lat, mesh3_lat).expect("lat");
-        let grid_lon = to_grid(mesh1_lon, mesh2_lon, mesh3_lon).expect("lon");
+        let index_lat = to_grid_index(mesh1_lat, mesh2_lat, mesh3_lat).expect("lat");
+        let index_lon = to_grid_index(mesh1_lon, mesh2_lon, mesh3_lon).expect("lon");
 
         fn parse_diff(line: &mut &str) -> anyhow::Result<i32> {
             let d_integer = parse_number(line, 4)?;
@@ -84,7 +84,7 @@ impl FromStr for Record {
         let d_lat_us = parse_diff(&mut line).expect("dB(sec)");
         let d_lon_us = parse_diff(&mut line).expect("dL(sec)");
 
-        Ok(Record(grid_lat, grid_lon, d_lat_us, d_lon_us))
+        Ok(Record(index_lat, index_lon, d_lat_us, d_lon_us))
     }
 }
 impl Display for Record {
