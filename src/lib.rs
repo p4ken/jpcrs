@@ -1,9 +1,13 @@
 mod grid;
+#[cfg(feature = "tky2jgd")]
+mod tky2jgd;
 
 /// 度
 pub type Degree = f64;
 
 pub type XY = (Degree, Degree);
+
+pub use grid::Grid;
 
 /// 日本測地系 Tokyo Datum
 pub struct TokyoDatum {
