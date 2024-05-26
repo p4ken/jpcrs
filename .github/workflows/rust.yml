@@ -4,16 +4,33 @@ on:
   push:
   schedule:
     - cron:  '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      bump:
+        required: false
+        # default: ''
+        type: choice
+        options:
+          - patch
+          - minor
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Build
       run: make
+
+  publish:
+    if: "${{ github.event.inputs.bump != '' }}"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Publish
+      env:
+        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      run: echo $CARGO_REGISTRY_TOKEN
