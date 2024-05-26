@@ -12,7 +12,7 @@ const TKY2JGD: Grid = TKY2JGD_BIN.to_grid();
 
 // const TKY2JGD_G: GridPar<4707876> = GridPar::new(Bin(*include_bytes!("../par/TKY2JGD.in")));
 
-#[repr(align(4))]
+#[repr(align(4))] // <- this is why the bytes wrapped with the struct.
 struct Bin<const N: usize>([u8; N]);
 impl<const N: usize> Bin<N> {
     const fn to_grid(&self) -> Grid {
