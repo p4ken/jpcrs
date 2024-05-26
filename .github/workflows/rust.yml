@@ -3,7 +3,7 @@ name: Rust
 on:
   push:
   schedule:
-    - cron:  '0 3 * * *'
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       bump:
@@ -26,7 +26,7 @@ jobs:
 
   publish:
     if: "${{ inputs.bump }}"
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
