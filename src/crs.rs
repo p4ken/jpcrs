@@ -9,7 +9,7 @@ impl TokyoDatum {
     // Bessel楕円体
 
     pub fn with_xy(xy: impl Into<XY>) -> Self {
-        let (x, y) = xy.into();
+        let XY(x, y) = xy.into();
         Self { lat: y, lon: x }
     }
 
@@ -79,8 +79,8 @@ pub struct JGD2011 {
 }
 
 impl JGD2011 {
-    pub fn xy(self) -> XY {
-        (self.lon, self.lat)
+    pub fn xy(self) -> [Degree; 2] {
+        [self.lon, self.lat]
     }
 
     pub fn latlon(self) -> LatLon {

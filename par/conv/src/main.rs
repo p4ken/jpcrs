@@ -60,7 +60,7 @@ impl FromStr for Record {
         let (mesh2_lat, mesh2_lon) = parse_meshcode(&mut line, 1).expect("2nd mesh");
         let (mesh3_lat, mesh3_lon) = parse_meshcode(&mut line, 1).expect("3rd mesh");
 
-        // Serial number of 3rd mesh grids starting from BL(0,0)
+        // Serial number of 3rd mesh grids starting from 0 degree
         fn to_grid_index(mesh1: i64, mesh2: i64, mesh3: i64) -> anyhow::Result<i16> {
             (mesh1 * 80 + mesh2 * 10 + mesh3)
                 .try_into()

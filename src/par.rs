@@ -11,8 +11,8 @@ pub fn tky2jgd(lat: i32, lon: i32) -> (i32, i32) {
 
 pub fn inverse() {}
 
-#[derive(Debug)]
-#[repr(align(4))] // <- this is why the bytes are wrapped.
+// wrap bytes to align
+#[repr(align(4))]
 pub struct Bin<const N: usize>([u8; N]);
 impl<const N: usize> Bin<N> {
     pub const fn to_grid(&self) -> Grid {
@@ -23,9 +23,9 @@ impl<const N: usize> Bin<N> {
         #[cfg(not(target_endian = "little"))]
         compile_error!("compile target must be little endian");
         // SAFETY:
-        // `data` is single allocated and aligned as same as `Dot`.
+        // `data` is single allocated and aligned as same as return type.
         // `len * element size` is within the length of `data` and is smaller than `isize::MAX`.
-        // Returned value is immutable. It's lifetime is same as `data`.
+        // Returned value is immutable. Its lifetime is same as `data`.
         let dots = unsafe { slice::from_raw_parts(data, len) };
 
         Grid::new(dots)

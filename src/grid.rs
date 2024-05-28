@@ -1,6 +1,6 @@
 //! Parameters grid.
 
-use crate::{par, LatLon};
+use crate::{par, LatLon, XY};
 
 #[cfg(feature = "tky2jgd")]
 pub const TKY2JGD: Grid = par::TKY2JGD.to_grid();
@@ -13,10 +13,7 @@ impl<'a> Grid<'a> {
     pub const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
-    pub fn interpolate(&self, bl: LatLon) -> LatLon {
-        todo!()
-    }
-    pub fn interpolate_wide(&self, bl: LatLon) -> LatLon {
+    pub fn interpolate(&self, xy: impl Into<XY>) -> XY {
         todo!()
     }
 }
@@ -45,7 +42,7 @@ struct Mesh3Index {
 
 #[derive(Debug)]
 #[repr(C)]
-struct MicroSecond {
+pub struct MicroSecond {
     lat: i32,
     lon: i32,
 }
