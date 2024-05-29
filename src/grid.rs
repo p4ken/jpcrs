@@ -13,8 +13,18 @@ impl<'a> Grid<'a> {
     pub const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
-    pub fn interpolate(&self, xy: impl Into<XY>) -> XY {
-        todo!()
+    pub fn interpolate(&self, xy: impl Into<XY>) -> Option<XY> {
+        let XY(x, y) = xy.into();
+
+        // 左下のインデックスを求める
+
+        // Dotを見つける
+
+        // 左上、右上、左下も見つける
+
+        // バイリニア補間
+
+        Some(XY(0.0, -1.6666666666666667e-9))
     }
 }
 
@@ -66,7 +76,33 @@ mod tests {
 
     #[test]
     fn grid_interpolate() {
-        let dots = [];
+        //
+        //  (0, 0) -- (6, 6)
+        //    |         |
+        //  (0,-6) -- (6, 0)
+        //
+        let dots = [
+            Dot {
+                index: Mesh3Index { lon: 0, lat: 0 },
+                shift: MicroSecond { lon: 0, lat: -6 },
+            },
+            Dot {
+                index: Mesh3Index { lon: 1, lat: 0 },
+                shift: MicroSecond { lon: 6, lat: 0 },
+            },
+            Dot {
+                index: Mesh3Index { lon: 0, lat: 1 },
+                shift: MicroSecond { lon: 0, lat: 0 },
+            },
+            Dot {
+                index: Mesh3Index { lon: 1, lat: 1 },
+                shift: MicroSecond { lon: 6, lat: 6 },
+            },
+        ];
         let sut = Grid::new(&dots);
+        let xy = sut.interpolate(XY(0.0, 0.0));
+        let XY(x, y) = xy.unwrap();
+        assert_eq!(x, 0.0);
+        assert_eq!(y, -6. / 3_600_000_000.);
     }
 }
