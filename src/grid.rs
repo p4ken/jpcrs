@@ -1,6 +1,6 @@
 //! Parameters grid.
 
-use crate::{par, LatLon, XY};
+use crate::{par, Degree};
 
 #[cfg(feature = "tky2jgd")]
 pub const TKY2JGD: Grid = par::TKY2JGD.to_grid();
@@ -13,10 +13,12 @@ impl<'a> Grid<'a> {
     pub const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
-    pub fn interpolate(&self, xy: impl Into<XY>) -> Option<XY> {
-        let XY(x, y) = xy.into();
+    pub fn interpolate(&self, xy: [Degree; 2]) -> Option<[Degree; 2]> {
+        // let XY(x, y) = xy.into();
 
         // 左下のインデックスを求める
+        let sw = Mesh3Index::southwest([0., 0.]);
+        dbg!(sw);
 
         // Dotを見つける
 
@@ -24,8 +26,9 @@ impl<'a> Grid<'a> {
 
         // バイリニア補間
 
-        Some(XY(0.0, -1.6666666666666667e-9))
+        Some([0.0, -1.6666666666666667e-9])
     }
+    // fn binary_search
 }
 
 #[derive(Debug)]
@@ -48,6 +51,22 @@ impl Dot {
 struct Mesh3Index {
     lat: i16,
     lon: i16,
+}
+impl Mesh3Index {
+    fn southwest(xy: [Degree; 2]) -> Self {
+        let [x, y] = xy;
+
+        // https://stackoverflow.com/a/61151563/21835147
+        #[rustversion::before(1.45)]
+        fn msrv() {
+            compile_error!("rustc version 1.45 or newer is required");
+        }
+
+        let lat = (y / 108_000.) as i16;
+        let lon = (x / 162_000.) as i16;
+
+        Self { lat, lon }
+    }
 }
 
 #[derive(Debug)]
@@ -100,8 +119,8 @@ mod tests {
             },
         ];
         let sut = Grid::new(&dots);
-        let xy = sut.interpolate(XY(0.0, 0.0));
-        let XY(x, y) = xy.unwrap();
+        let xy = sut.interpolate([0., 0.]);
+        let [x, y] = xy.unwrap();
         assert_eq!(x, 0.0);
         assert_eq!(y, -6. / 3_600_000_000.);
     }

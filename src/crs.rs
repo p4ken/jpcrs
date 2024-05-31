@@ -1,17 +1,17 @@
-use crate::{Degree, LatLon, XY};
+use crate::Degree;
 
 /// 日本測地系 Tokyo Datum
 pub struct TokyoDatum {
-    pub lat: Degree,
-    pub lon: Degree,
+    lat: Degree,
+    lon: Degree,
 }
 impl TokyoDatum {
     // Bessel楕円体
 
-    pub fn with_xy(xy: impl Into<XY>) -> Self {
-        let XY(x, y) = xy.into();
-        Self { lat: y, lon: x }
-    }
+    // pub fn with_xy(xy: impl Into<XY>) -> Self {
+    //     let XY(x, y) = xy.into();
+    //     Self { lat: y, lon: x }
+    // }
 
     /// `tky2jgd.par` を用いて [`JGD2000`] へ変換する
     pub fn to_jgd2000(self) -> JGD2000 {
@@ -46,8 +46,8 @@ impl<T> Tokyo97<T> {
 ///
 /// 世界測地系 (JGD2000)
 pub struct JGD2000 {
-    pub lat: Degree,
-    pub lon: Degree,
+    lat: Degree,
+    lon: Degree,
 }
 
 impl JGD2000 {
@@ -74,8 +74,8 @@ impl JGD2000 {
 
 /// 世界測地系 JGD2011
 pub struct JGD2011 {
-    pub lat: Degree,
-    pub lon: Degree,
+    lat: Degree,
+    lon: Degree,
 }
 
 impl JGD2011 {
@@ -83,9 +83,9 @@ impl JGD2011 {
         [self.lon, self.lat]
     }
 
-    pub fn latlon(self) -> LatLon {
-        todo!()
-    }
+    // pub fn latlon(self) -> LatLon {
+    //     todo!()
+    // }
 
     /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2000`] へ逆変換する
     pub fn to_jgd2000(self) {}
