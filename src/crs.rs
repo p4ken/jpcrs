@@ -1,11 +1,15 @@
 use crate::Degree;
 
-/// 日本測地系 Tokyo Datum
-pub struct TokyoDatum {
+/// 旧日本測地系。
+///
+/// Tokyo Datum, the older Japanese Datum.
+///
+/// EPSG:4301
+pub struct Tokyo {
     lat: Degree,
     lon: Degree,
 }
-impl TokyoDatum {
+impl Tokyo {
     // Bessel楕円体
 
     // pub fn with_xy(xy: impl Into<XY>) -> Self {
@@ -14,7 +18,7 @@ impl TokyoDatum {
     // }
 
     /// `tky2jgd.par` を用いて [`JGD2000`] へ変換する
-    pub fn to_jgd2000(self) -> JGD2000 {
+    pub fn to_jgd2000(self) -> Jgd2000 {
         // 国土地理院時報(2002，97集)「世界測地系移行のための座標変換ソフトウェア”TKY2JGD"」
         // https://www.gsi.go.jp/common/000063173.pdf
         // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する。
@@ -28,7 +32,13 @@ impl TokyoDatum {
     }
 }
 
-/// 日本測地系 Tokyo97
+/// 旧日本測地系 Tokyo97.
+///
+/// Tokyo97, the older Japanese Datum.
+///
+/// 3パラメータを用いた変換式で定義される座標系[^1]。
+///
+/// [^1]: [飛田幹男(1997) 最近の測地座標系と座標変換についての考察](https://www.jstage.jst.go.jp/article/sokuchi1954/43/4/43_4_231/_pdf)
 pub struct Tokyo97<T>(T);
 
 impl<T> Tokyo97<T> {
@@ -42,19 +52,21 @@ impl<T> Tokyo97<T> {
     }
 }
 
-/// Japanese Geodetic Datum 2000
+/// 世界測地系 JGD2000.
 ///
-/// 世界測地系 (JGD2000)
-pub struct JGD2000 {
+/// Japanese Geodetic Datum 2000 (JGD2000).
+///
+/// EPSG:4612
+pub struct Jgd2000 {
     lat: Degree,
     lon: Degree,
 }
 
-impl JGD2000 {
+impl Jgd2000 {
     // GRS80楕円体
 
     /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2011`] へ変換する
-    pub fn to_jgd2011(self) -> JGD2011 {
+    pub fn to_jgd2011(self) -> Jgd2011 {
         // 地震時地殻変動に伴う座標値の変化を補正するソフトウェア“PatchJGD”
         // https://www.jstage.jst.go.jp/article/sokuchi/55/4/55_4_355/_pdf/-char/ja
         todo!()
@@ -73,12 +85,12 @@ impl JGD2000 {
 }
 
 /// 世界測地系 JGD2011
-pub struct JGD2011 {
+pub struct Jgd2011 {
     lat: Degree,
     lon: Degree,
 }
 
-impl JGD2011 {
+impl Jgd2011 {
     pub fn xy(self) -> [Degree; 2] {
         [self.lon, self.lat]
     }
