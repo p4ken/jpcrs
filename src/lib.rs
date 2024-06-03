@@ -10,6 +10,10 @@ pub use grid::Grid;
 #[cfg(feature = "tky2jgd")]
 pub use grid::TKY2JGD;
 
-pub fn from_tokyo(xy: [Degree; 2]) -> Tokyo {
+pub fn from_tokyo(degree: Degree) -> Tokyo {
     todo!()
 }
+
+// pub fn xy(xy: [f64; 2]) -> Degree {
+//     Degree::with_xy(xy)
+// }

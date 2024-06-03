@@ -1,13 +1,11 @@
 use crate::Degree;
 
 /// 旧日本測地系。
-///
 /// Tokyo Datum, the older Japanese Datum.
 ///
-/// EPSG:4301
+/// EPSG: 4301
 pub struct Tokyo {
-    lat: Degree,
-    lon: Degree,
+    degree: Degree,
 }
 impl Tokyo {
     // Bessel楕円体
@@ -32,12 +30,10 @@ impl Tokyo {
     }
 }
 
-/// 旧日本測地系 Tokyo97.
-///
+/// Tokyo97 座標系。
 /// Tokyo97, the older Japanese Datum.
 ///
-/// 3パラメータを用いた変換式で定義される座標系[^1]。
-///
+/// 3パラメータを用いた変換式[^1]で定義される旧日本測地系。
 /// [^1]: [飛田幹男(1997) 最近の測地座標系と座標変換についての考察](https://www.jstage.jst.go.jp/article/sokuchi1954/43/4/43_4_231/_pdf)
 pub struct Tokyo97<T>(T);
 
@@ -58,8 +54,7 @@ impl<T> Tokyo97<T> {
 ///
 /// EPSG:4612
 pub struct Jgd2000 {
-    lat: Degree,
-    lon: Degree,
+    degeee: Degree,
 }
 
 impl Jgd2000 {
@@ -84,15 +79,14 @@ impl Jgd2000 {
     }
 }
 
-/// 世界測地系 JGD2011
+/// 世界測地系 JGD2011.
 pub struct Jgd2011 {
-    lat: Degree,
-    lon: Degree,
+    degree: Degree,
 }
 
 impl Jgd2011 {
-    pub fn xy(self) -> [Degree; 2] {
-        [self.lon, self.lat]
+    pub fn xy(self) -> [f64; 2] {
+        self.degree.xy()
     }
 
     // pub fn latlon(self) -> LatLon {
