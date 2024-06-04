@@ -15,34 +15,33 @@ impl<'a> Grid<'a> {
     }
     pub fn interpolate(&self, p: Degree) -> Option<Degree> {
         let sw_mesh = Mesh3::southwest(p);
-        let i = self.search(sw_mesh)?;
-        let sw_shift = self.dots[i].shift;
+        let i = self.search_after(0, sw_mesh)?;
+        let sw_shift = self.dots[i];
 
-        let i = self.at(i + 1)?.search(sw_mesh.to_east())?;
+        let i = self.search_at(i + 1, sw_mesh.to_east())?;
         let se_shift = self.dots[i].shift;
 
-        let i = self.after(i + 1)?.search(sw_mesh.to_north())?;
+        let i = self.search_after(i + 1, sw_mesh.to_north())?;
         let nw_shift = self.dots[i].shift;
 
-        let i = self.at(i + 1)?.search(sw_mesh.to_north().to_east())?;
+        let i = self.search_at(i + 1, sw_mesh.to_north().to_east())?;
         let ne_shift = self.dots[i].shift;
 
         // bilinear interpolation
-        let [s_weight, w_weight] = sw_mesh.southwest_weight(p);
+        let [s_weight, w_weight] = sw_mesh.weight(p);
         // let lat_shift = sw_shift.to_degree() * (s_weight * w_weight);
 
         Some(Degree::new([0.0, -1.6666666666666667e-9]))
     }
-    fn search(&self, query: Mesh3) -> Option<usize> {
-        self.dots.binary_search_by_key(&query, |dot| dot.mesh).ok()
+    fn search_after(&self, first: usize, query: Mesh3) -> Option<usize> {
+        self.dots
+            .get(first..)?
+            .binary_search_by_key(&query, |dot| dot.mesh)
+            .ok()
+            .map(|i| i + first)
     }
-    fn after(&self, first: usize) -> Option<Self> {
-        let dots = self.dots.get(first..)?;
-        Some(Self::new(dots))
-    }
-    fn at(&self, index: usize) -> Option<Self> {
-        let dots = self.dots.get(index..=index)?;
-        Some(Self::new(dots))
+    fn search_at(&self, index: usize, query: Mesh3) -> Option<usize> {
+        (self.dots.get(index)?.mesh == query).then_some(index)
     }
 }
 // impl Index<SliceIndex<[Dot]>> for Grid<'_> {
@@ -85,17 +84,17 @@ impl Mesh3 {
     const LON_SEC: f64 = 45.;
 
     /// Evaluate the southwest of the mesh containing `p`.
-    fn southwest(p: Degree) -> Self {
-        let [x, y] = p.xy();
-        let lat = (y * 120.) as i16;
-        let lon = (x * 80.) as i16;
+    fn southwest(degree: Degree) -> Self {
+        let [lat_degree, lon_degree] = degree.latlon();
+        let lat = (lat_degree * 120.) as i16;
+        let lon = (lon_degree * 80.) as i16;
         Self { lat, lon }
     }
-    fn southwest_weight(self, p: Degree) -> [f64; 2] {
-        let [lat_max, lon_max] = self.to_north().to_east().to_degree().latlon();
+    fn weight(self, p: Degree) -> [f64; 2] {
+        let [lat_dot, lon_dot] = self.to_degree().latlon();
         let [lat_p, lon_p] = p.latlon();
-        let weight_lat = (lat_max - lat_p) * 3_600. / Self::LAT_SEC;
-        let weight_lon = (lon_max - lon_p) * 3_600. / Self::LON_SEC;
+        let weight_lat = (lat_dot - lat_p).abs() * 3_600. / Self::LAT_SEC;
+        let weight_lon = (lon_dot - lon_p).abs() * 3_600. / Self::LON_SEC;
         [weight_lat, weight_lon]
     }
     fn to_north(mut self) -> Self {

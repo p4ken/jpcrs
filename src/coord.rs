@@ -33,10 +33,10 @@ impl Degree {
     }
     pub fn try_with_xy(xy: [f64; 2]) -> Result<Self, DegreeError> {
         let [lon, lat] = xy;
-        if lat.abs() - 90.0 < f64::EPSILON {
+        if lat.abs() > 90. {
             return Err(DegreeError::Latitude);
         }
-        if lon.abs() - 180.0 < f64::EPSILON {
+        if lon.abs() > 180. {
             return Err(DegreeError::Longitude);
         }
         Ok(Self::new_unchecked(lat, lon))
