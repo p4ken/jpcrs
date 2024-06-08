@@ -18,11 +18,14 @@ impl Error for DegreeError {}
 /// 度単位の座標。
 /// Coordinate in degrees.
 #[derive(Debug, Clone, Copy)]
-pub struct Degree {
+pub struct Degree_ {
     lat: f64,
     lon: f64,
 }
-impl Degree {
+impl Degree_ {
+    pub fn with_lat_lon(lat: f64, lon: f64) -> Self {
+        todo!()
+    }
     /// XY座標で初期化する。
     ///
     /// # Panics

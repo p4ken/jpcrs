@@ -1,6 +1,6 @@
 //! Parameters grid.
 
-use crate::{par, Degree};
+use crate::{par, Degree_};
 
 #[cfg(feature = "tky2jgd")]
 pub const TKY2JGD: Grid = par::TKY2JGD.to_grid();
@@ -13,7 +13,7 @@ impl<'a> Grid<'a> {
     pub const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
-    pub fn interpolate(&self, p: Degree) -> Option<Degree> {
+    pub fn interpolate(&self, p: Degree_) -> Option<Degree_> {
         let sw_mesh = Mesh3::southwest(p);
         let i = self.search_after(0, sw_mesh)?;
         let sw_shift = self.dots[i];
@@ -31,7 +31,7 @@ impl<'a> Grid<'a> {
         let [s_weight, w_weight] = sw_mesh.weight(p);
         // let lat_shift = sw_shift.to_degree() * (s_weight * w_weight);
 
-        Some(Degree::new([0.0, -1.6666666666666667e-9]))
+        Some(Degree_::new([0.0, -1.6666666666666667e-9]))
     }
     fn search_after(&self, first: usize, query: Mesh3) -> Option<usize> {
         self.dots
@@ -63,14 +63,6 @@ pub struct Dot {
     mesh: Mesh3,
     shift: MicroSecond,
 }
-impl Dot {
-    // fn to_key(&self) -> MilliSecond {
-    //     MilliSecond(Geodetic {
-    //         lat: i32::from(self.grid_lat) * 30 * 1000,
-    //         lon: i32::from(self.grid_lon) * 45 * 1000,
-    //     })
-    // }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(C)]
@@ -84,13 +76,13 @@ impl Mesh3 {
     const LON_SEC: f64 = 45.;
 
     /// Evaluate the southwest of the mesh containing `p`.
-    fn southwest(degree: Degree) -> Self {
+    fn southwest(degree: Degree_) -> Self {
         let [lat_degree, lon_degree] = degree.latlon();
         let lat = (lat_degree * 120.) as i16;
         let lon = (lon_degree * 80.) as i16;
         Self { lat, lon }
     }
-    fn weight(self, p: Degree) -> [f64; 2] {
+    fn weight(self, p: Degree_) -> [f64; 2] {
         let [lat_dot, lon_dot] = self.to_degree().latlon();
         let [lat_p, lon_p] = p.latlon();
         let weight_lat = (lat_dot - lat_p).abs() * 3_600. / Self::LAT_SEC;
@@ -105,10 +97,10 @@ impl Mesh3 {
         self.lon += 1;
         self
     }
-    fn to_degree(self) -> Degree {
+    fn to_degree(self) -> Degree_ {
         let lat = f64::from(self.lat) * Self::LAT_SEC / 3_600.;
         let lon = f64::from(self.lat) * Self::LON_SEC / 3_600.;
-        Degree::new_unchecked(lat, lon)
+        Degree_::new_unchecked(lat, lon)
     }
 }
 
@@ -119,10 +111,10 @@ pub struct MicroSecond {
     lon: i32,
 }
 impl MicroSecond {
-    fn to_degree(self) -> Degree {
+    fn to_degree(self) -> Degree_ {
         let lat = f64::from(self.lat) / 3_600_000.;
         let lon = f64::from(self.lon) / 3_600_000.;
-        Degree::new_unchecked(lat, lon)
+        Degree_::new_unchecked(lat, lon)
     }
 }
 
@@ -169,7 +161,7 @@ mod tests {
             },
         ];
         let sut = Grid::new(&dots);
-        let xy = sut.interpolate(Degree::new([0., 0.]));
+        let xy = sut.interpolate(Degree_::new([0., 0.]));
         let [x, y] = xy.unwrap().xy();
         assert_eq!(x, 0.0);
         assert_eq!(y, -6. / 3_600_000_000.);
