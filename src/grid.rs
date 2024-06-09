@@ -19,9 +19,13 @@ impl<'a> Grid<'a> {
         Self { dots }
     }
     pub fn interpolate(&self, p: LatLon) -> Option<LatLon> {
+        // bilinear interpolation
+        self.search_quad(p).map(|quad| quad.weighted_mean(p))
+    }
+    fn search_quad(&self, p: LatLon) -> Option<Quad> {
         let sw_mesh = Mesh3::southwest(&p);
         let i = self.search_after(0, sw_mesh)?;
-        let sw_shift = self.dots[i];
+        let sw_shift = self.dots[i].shift;
 
         let i = self.search_at(i + 1, sw_mesh.to_east())?;
         let se_shift = self.dots[i].shift;
@@ -32,11 +36,13 @@ impl<'a> Grid<'a> {
         let i = self.search_at(i + 1, sw_mesh.to_north().to_east())?;
         let ne_shift = self.dots[i].shift;
 
-        // bilinear interpolation
-        let [s_weight, w_weight] = sw_mesh.weight(&p);
-        // let lat_shift = sw_shift.to_degree() * (s_weight * w_weight);
-
-        Some(LatLon(-1.6666666666666667e-9, 0.0))
+        Some(Quad {
+            sw_mesh,
+            sw_shift,
+            se_shift,
+            nw_shift,
+            ne_shift,
+        })
     }
     fn search_after(&self, first: usize, query: Mesh3) -> Option<usize> {
         self.dots
@@ -49,17 +55,21 @@ impl<'a> Grid<'a> {
         (self.dots.get(index)?.mesh == query).then_some(index)
     }
 }
-// impl Index<SliceIndex<[Dot]>> for Grid<'_> {
-//     type Output = Self;
 
-//     fn index(&self, index: SliceIndex<[Dot]>) -> &Self::Output {
-//         todo!()
-//     }
-// }
-
-struct Quad {}
+struct Quad {
+    sw_mesh: Mesh3,
+    sw_shift: MicroSecond,
+    se_shift: MicroSecond,
+    nw_shift: MicroSecond,
+    ne_shift: MicroSecond,
+}
 impl Quad {
-    fn weighted_mean(self) {}
+    fn weighted_mean(self, p: LatLon) -> LatLon {
+        let [s_weight, w_weight] = self.sw_mesh.weight(&p);
+        // let lat_shift = sw_shift.to_degree() * (s_weight * w_weight);
+
+        LatLon(-1.6666666666666667e-9, 0.0)
+    }
 }
 
 #[derive(Debug, Clone, Copy)]

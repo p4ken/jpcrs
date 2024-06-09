@@ -1,3 +1,5 @@
+#![cfg(feature = "default")]
+
 use geo::Point;
 use jgd::{LatLon, LonLat};
 
