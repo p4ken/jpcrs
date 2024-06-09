@@ -1,5 +1,8 @@
 use crate::LatLon;
 
+#[cfg(feature = "tky2jgd")]
+use crate::TKY2JGD;
+
 pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
     Tokyo::new(LatLon(lat, lon))
 }
@@ -32,7 +35,7 @@ impl Tokyo {
     //     Self { lat: y, lon: x }
     // }
 
-    /// `tky2jgd.par` を用いて [`JGD2000`] へ変換する。
+    /// [`TKY2JGD`] を用いて [`JGD2000`] へ変換する。
     ///
     /// パラメータグリッドの範囲外の場合は、3パラメータにフォールバックする。
     #[cfg(feature = "tky2jgd")]
@@ -40,7 +43,7 @@ impl Tokyo {
         // 国土地理院時報(2002，97集)「世界測地系移行のための座標変換ソフトウェア”TKY2JGD"」
         // https://www.gsi.go.jp/common/000063173.pdf
         // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する。
-        match crate::TKY2JGD.interpolate(self.lat_lon) {
+        match TKY2JGD.interpolate(self.lat_lon) {
             Some(shift) => Jgd2000::new(self.lat_lon + shift),
             None => self.to_tokyo97().to_jgd2000(),
         }
@@ -57,8 +60,7 @@ impl Tokyo {
 /// Tokyo97 座標系。
 /// Tokyo97, the older Japanese Datum.
 ///
-/// 3パラメータを用いた変換式[^1]で定義される旧日本測地系。
-/// [^1]: [飛田幹男(1997) 最近の測地座標系と座標変換についての考察](https://www.jstage.jst.go.jp/article/sokuchi1954/43/4/43_4_231/_pdf)
+/// 3パラメータを用いた変換式 ([飛田幹男, 1997](crate#references)) で定義される旧日本測地系。
 pub struct Tokyo97 {
     lat_lon: LatLon,
 }
