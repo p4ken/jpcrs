@@ -32,8 +32,9 @@ impl<T: Geodetic> Tokyo<T> {
         // 国土地理院時報(2002，97集)「世界測地系移行のための座標変換ソフトウェア”TKY2JGD"」
         // https://www.gsi.go.jp/common/000063173.pdf
         // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する。
-        match crate::TKY2JGD.interpolate(self.geodetic.into()) {
-            Some(jgd) => Jgd2000::new(T::from(jgd)),
+        let latlon = self.geodetic.into();
+        match crate::TKY2JGD.interpolate(latlon) {
+            Some(shift) => Jgd2000::new(T::from(latlon + shift)),
             None => self.to_tokyo97().to_jgd2000(),
         }
     }

@@ -19,30 +19,29 @@ impl<'a> Grid<'a> {
         Self { dots }
     }
     pub fn interpolate(&self, p: LatLon) -> Option<LatLon> {
-        // bilinear interpolation
-        self.search_quad(p).map(|quad| quad.weighted_mean(p))
-    }
-    fn search_quad(&self, p: LatLon) -> Option<Quad> {
-        let sw_mesh = Mesh3::southwest(&p);
-        let i = self.search_after(0, sw_mesh)?;
+        let mesh = Mesh3::floor(p);
+        let i = self.search_after(0, mesh)?;
         let sw_shift = self.dots[i].shift;
 
-        let i = self.search_at(i + 1, sw_mesh.to_east())?;
+        let i = self.search_at(i + 1, mesh.east())?;
         let se_shift = self.dots[i].shift;
 
-        let i = self.search_after(i + 1, sw_mesh.to_north())?;
+        let i = self.search_after(i + 1, mesh.north())?;
         let nw_shift = self.dots[i].shift;
 
-        let i = self.search_at(i + 1, sw_mesh.to_north().to_east())?;
+        let i = self.search_at(i + 1, mesh.north().east())?;
         let ne_shift = self.dots[i].shift;
 
-        Some(Quad {
-            sw_mesh,
-            sw_shift,
-            se_shift,
-            nw_shift,
-            ne_shift,
-        })
+        let LatLon(n_weight, e_weight) = mesh.diagonal_weight(p);
+        let LatLon(s_weight, w_weight) = mesh.north().east().diagonal_weight(p);
+
+        // bilinear interpolation by weighted mean
+        let shift = sw_shift.to_degree() * s_weight * w_weight
+            + se_shift.to_degree() * s_weight * e_weight
+            + nw_shift.to_degree() * n_weight * w_weight
+            + ne_shift.to_degree() * n_weight * e_weight;
+
+        Some(shift)
     }
     fn search_after(&self, first: usize, query: Mesh3) -> Option<usize> {
         self.dots
@@ -53,22 +52,6 @@ impl<'a> Grid<'a> {
     }
     fn search_at(&self, index: usize, query: Mesh3) -> Option<usize> {
         (self.dots.get(index)?.mesh == query).then_some(index)
-    }
-}
-
-struct Quad {
-    sw_mesh: Mesh3,
-    sw_shift: MicroSecond,
-    se_shift: MicroSecond,
-    nw_shift: MicroSecond,
-    ne_shift: MicroSecond,
-}
-impl Quad {
-    fn weighted_mean(self, p: LatLon) -> LatLon {
-        let [s_weight, w_weight] = self.sw_mesh.weight(&p);
-        // let lat_shift = sw_shift.to_degree() * (s_weight * w_weight);
-
-        LatLon(-1.6666666666666667e-9, 0.0)
     }
 }
 
@@ -91,24 +74,24 @@ impl Mesh3 {
     const LON_SEC: f64 = 45.;
 
     /// Evaluate the southwest of the mesh containing `p`.
-    fn southwest(degree: &LatLon) -> Self {
+    fn floor(degree: LatLon) -> Self {
         // "saturating cast" since Rust 1.45.0
         // https://blog.rust-lang.org/2020/07/16/Rust-1.45.0.html#fixing-unsoundness-in-casts
         let lat = (degree.lat() * 120.) as i16;
         let lon = (degree.lon() * 80.) as i16;
         Self { lat, lon }
     }
-    fn weight(self, p: &LatLon) -> [f64; 2] {
-        let southeast = self.to_degree();
-        let weight_lat = (southeast.lat() - p.lat()).abs() * 3_600. / Self::LAT_SEC;
-        let weight_lon = (southeast.lon() - p.lon()).abs() * 3_600. / Self::LON_SEC;
-        [weight_lat, weight_lon]
+    fn diagonal_weight(self, p: LatLon) -> LatLon {
+        let min_degree = self.to_degree();
+        let weight_lat = (p.lat() - min_degree.lat()).abs() * 3_600. / Self::LAT_SEC;
+        let weight_lon = (p.lon() - min_degree.lon()).abs() * 3_600. / Self::LON_SEC;
+        LatLon(weight_lat, weight_lon)
     }
-    fn to_north(mut self) -> Self {
+    fn north(mut self) -> Self {
         self.lat += 1;
         self
     }
-    fn to_east(mut self) -> Self {
+    fn east(mut self) -> Self {
         self.lon += 1;
         self
     }
@@ -127,8 +110,8 @@ pub struct MicroSecond {
 }
 impl MicroSecond {
     fn to_degree(self) -> LatLon {
-        let lat = f64::from(self.lat) / 3_600_000.;
-        let lon = f64::from(self.lon) / 3_600_000.;
+        let lat = f64::from(self.lat) / 3_600_000_000.;
+        let lon = f64::from(self.lon) / 3_600_000_000.;
         LatLon(lat, lon)
     }
 }

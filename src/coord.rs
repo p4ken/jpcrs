@@ -1,3 +1,5 @@
+use std::ops::{Add, Mul, Sub};
+
 /// 測地座標。
 /// Geodetic coordinate.
 pub trait Geodetic: Copy + From<LatLon> + Into<LatLon> {
@@ -44,6 +46,24 @@ impl Geodetic for LatLon {
 impl From<LonLat> for LatLon {
     fn from(LonLat(lon, lat): LonLat) -> Self {
         Self(lat, lon)
+    }
+}
+impl Add<LatLon> for LatLon {
+    type Output = Self;
+    fn add(self, rhs: LatLon) -> Self::Output {
+        Self(self.0 + rhs.0, self.1 + rhs.1)
+    }
+}
+impl Sub<LatLon> for LatLon {
+    type Output = Self;
+    fn sub(self, rhs: LatLon) -> Self::Output {
+        Self(self.0 - rhs.0, self.1 - rhs.1)
+    }
+}
+impl Mul<f64> for LatLon {
+    type Output = Self;
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self(self.0 * rhs, self.1 * rhs)
     }
 }
 // impl From<LatLon> for (f64, f64) {
