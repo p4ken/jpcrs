@@ -5,13 +5,16 @@ edition = "2021"
 description = "Transform geodetic coordinates used in Japan"
 keywords = ["TKY2JGD", "PatchJGD", "JGD2000", "JGD2011"]
 
+# minimum in edition 2021
+rust-version = "1.56"
+
 [workspace]
 members = ["par/conv"]
 
 [features]
-default = ["tky2jgd", "touhokutaiheiyouoki2011"]
+default = ["tky2jgd", "patchjgd"]
 tky2jgd = []
-touhokutaiheiyouoki2011 = []
+patchjgd = []
 
 [dependencies]
 

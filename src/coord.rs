@@ -1,91 +1,92 @@
-use std::{error::Error, fmt::Display};
-
-#[derive(Debug)]
-pub enum DegreeError {
-    Latitude,
-    Longitude,
+/// 測地座標。
+/// Geodetic coordinate.
+pub trait Geodetic: Copy + From<LatLon> + Into<LatLon> {
+    // fn from_degrees(_: f64, _: f64) -> Self;
+    /// 度単位の値のペア。
+    fn degrees(&self) -> (f64, f64);
+    // fn to_latlon(&self) -> LatLon;
 }
-impl Display for DegreeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DegreeError::Latitude => f.write_str("invalid latitude in degrees"),
-            DegreeError::Longitude => f.write_str("invalid longitude in degrees"),
-        }
-    }
-}
-impl Error for DegreeError {}
 
-/// 度単位の座標。
-/// Coordinate in degrees.
+// mod seal {
+//     pub trait Sealed {}
+//     impl Sealed for super::LatLon {}
+//     impl Sealed for super::LonLat {}
+// }
+
+/// 度単位の緯度と経度のペア。
+/// Latitude and longitude in degrees.
 #[derive(Debug, Clone, Copy)]
-pub struct Degree_ {
-    lat: f64,
-    lon: f64,
-}
-impl Degree_ {
-    pub fn with_lat_lon(lat: f64, lon: f64) -> Self {
-        todo!()
-    }
-    /// XY座標で初期化する。
-    ///
-    /// # Panics
-    ///
-    /// It panics if `xy` is out of latitude and longitude in degrees.
-    pub fn new(xy: impl Into<[f64; 2]>) -> Self {
-        Self::try_with_xy(xy.into()).unwrap()
-    }
-    pub fn try_with_xy(xy: [f64; 2]) -> Result<Self, DegreeError> {
-        let [lon, lat] = xy;
-        if lat.abs() > 90. {
-            return Err(DegreeError::Latitude);
-        }
-        if lon.abs() > 180. {
-            return Err(DegreeError::Longitude);
-        }
-        Ok(Self::new_unchecked(lat, lon))
-    }
-    pub(crate) fn new_unchecked(lat: f64, lon: f64) -> Self {
-        Self { lat, lon }
-    }
-    // pub fn with_xy(xy: [f64; 2]) -> Self {
-    //     Self::new(xy)
+pub struct LatLon(pub f64, pub f64);
+impl LatLon {
+    // pub fn new(lat: f64, lon: f64) -> Self {
+    //     Self(lat, lon)
     // }
-    pub fn try_with_latlon(latlon: [f64; 2]) -> Result<Self, DegreeError> {
-        let [lat, lon] = latlon;
-        Self::try_with_xy([lon, lat])
+    pub fn lat(&self) -> f64 {
+        self.0
     }
-    pub fn xy(self) -> [f64; 2] {
-        [self.lon, self.lat]
+    pub fn lon(&self) -> f64 {
+        self.1
     }
-    pub fn latlon(self) -> [f64; 2] {
-        [self.lat, self.lon]
+    // // これだと取り出す時に再度逆転させる必要がある。
+    // pub fn from_lonlat(lonlat: impl Into<(f64, f64)>) -> Self {
+    //     let (lon, lat) = lonlat.into();
+    //     Self(lat, lon)
+    // }
+}
+impl Geodetic for LatLon {
+    fn degrees(&self) -> (f64, f64) {
+        (self.0, self.1)
+    }
+    // fn to_latlon(&self) -> LatLon {
+    //     self.clone()
+    // }
+}
+impl From<LonLat> for LatLon {
+    fn from(LonLat(lon, lat): LonLat) -> Self {
+        Self(lat, lon)
     }
 }
-
-// pub struct XY<T>(T, T);
-// impl<T, U: Into<[T; 2]>> From<U> for XY<T> {
-//     fn from(into_xy: U) -> Self {
-//         let [x, y] = into_xy.into();
-//         Self(x, y)
-//     }
-// }
-// pub struct LatLon<T>(T, T);
-
-// pub struct XY(pub Degree, pub Degree);
-// impl From<LatLon> for XY {
-//     fn from(latlon: LatLon) -> Self {
-//         let LatLon(lat, lon) = latlon;
-//         Self(lon, lat)
-//     }
-// }
-// impl<T: Into<[f64; 2]>> From<T> for XY {
-//     fn from(xy: T) -> Self {
-//         let [x, y] = xy.into();
-//         Self(x, y)
+// impl From<LatLon> for (f64, f64) {
+//     fn from(LatLon(lat, lon): LatLon) -> Self {
+//         (lat, lon)
 //     }
 // }
 
-// pub struct LatLon(pub Degree, pub Degree);
+/// 度単位の経度と緯度のペア。
+/// Longitude and latitude in degrees.
+#[derive(Debug, Clone, Copy)]
+pub struct LonLat(f64, f64);
+impl LonLat {
+    pub fn new(lonlat: impl Into<(f64, f64)>) -> Self {
+        let (lon, lat) = lonlat.into();
+        Self(lon, lat)
+    }
+}
+impl Geodetic for LonLat {
+    fn degrees(&self) -> (f64, f64) {
+        (self.0, self.1)
+    }
+    // fn to_latlon(&self) -> LatLon {
+    //     let (lon, lat) = self.0;
+    //     LatLon(lat, lon)
+    // }
+}
+impl From<LatLon> for LonLat {
+    fn from(LatLon(lat, lon): LatLon) -> Self {
+        Self(lon, lat)
+    }
+}
+// impl From<LonLat> for (f64, f64) {
+//     fn from(LonLat((lon, lat)): LonLat) -> Self {
+//         (lat, lon)
+//     }
+// }
+// impl<T: Into<(f64, f64)>> From<T> for LonLat {
+//     fn from(lonlat: T) -> Self {
+//         let (lon, lat) = lonlat.into();
+//         Self((lon, lat))
+//     }
+// }
 
 pub struct ECEF {}
 impl ECEF {

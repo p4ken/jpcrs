@@ -5,6 +5,10 @@ use crate::{grid::Dot, Grid};
 #[cfg(feature = "tky2jgd")]
 pub const TKY2JGD: Bin<4707876> = Bin(*include_bytes!("../par/TKY2JGD.in"));
 
+#[cfg(feature = "patchjgd")]
+pub const TOUHOKUTAIHEIYOUOKI2011: Bin<1932636> =
+    Bin(*include_bytes!("../par/touhokutaiheiyouoki2011.in"));
+
 pub fn tky2jgd(lat: i32, lon: i32) -> (i32, i32) {
     (0, 0)
 }

@@ -1,10 +1,15 @@
-//! Parameters grid.
+use crate::{par, LatLon};
 
-use crate::{par, Degree_};
-
+/// 日本測地系から世界測地系への座標変換パラメータ。
 #[cfg(feature = "tky2jgd")]
 pub const TKY2JGD: Grid = par::TKY2JGD.to_grid();
 
+/// 平成23年(2011年)東北地方太平洋沖地震の座標補正パラメータ。
+#[cfg(feature = "patchjgd")]
+pub const TOUHOKUTAIHEIYOUOKI2011: Grid = par::TOUHOKUTAIHEIYOUOKI2011.to_grid();
+
+/// パラメータグリッド。
+/// Parameters grid.
 #[derive(Debug, Clone)]
 pub struct Grid<'a> {
     dots: &'a [Dot],
@@ -13,8 +18,8 @@ impl<'a> Grid<'a> {
     pub const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
-    pub fn interpolate(&self, p: Degree_) -> Option<Degree_> {
-        let sw_mesh = Mesh3::southwest(p);
+    pub fn interpolate(&self, p: LatLon) -> Option<LatLon> {
+        let sw_mesh = Mesh3::southwest(&p);
         let i = self.search_after(0, sw_mesh)?;
         let sw_shift = self.dots[i];
 
@@ -28,10 +33,10 @@ impl<'a> Grid<'a> {
         let ne_shift = self.dots[i].shift;
 
         // bilinear interpolation
-        let [s_weight, w_weight] = sw_mesh.weight(p);
+        let [s_weight, w_weight] = sw_mesh.weight(&p);
         // let lat_shift = sw_shift.to_degree() * (s_weight * w_weight);
 
-        Some(Degree_::new([0.0, -1.6666666666666667e-9]))
+        Some(LatLon(0.0, -1.6666666666666667e-9))
     }
     fn search_after(&self, first: usize, query: Mesh3) -> Option<usize> {
         self.dots
@@ -76,17 +81,17 @@ impl Mesh3 {
     const LON_SEC: f64 = 45.;
 
     /// Evaluate the southwest of the mesh containing `p`.
-    fn southwest(degree: Degree_) -> Self {
-        let [lat_degree, lon_degree] = degree.latlon();
-        let lat = (lat_degree * 120.) as i16;
-        let lon = (lon_degree * 80.) as i16;
+    fn southwest(degree: &LatLon) -> Self {
+        // "saturating cast" since Rust 1.45.0
+        // https://blog.rust-lang.org/2020/07/16/Rust-1.45.0.html#fixing-unsoundness-in-casts
+        let lat = (degree.lat() * 120.) as i16;
+        let lon = (degree.lon() * 80.) as i16;
         Self { lat, lon }
     }
-    fn weight(self, p: Degree_) -> [f64; 2] {
-        let [lat_dot, lon_dot] = self.to_degree().latlon();
-        let [lat_p, lon_p] = p.latlon();
-        let weight_lat = (lat_dot - lat_p).abs() * 3_600. / Self::LAT_SEC;
-        let weight_lon = (lon_dot - lon_p).abs() * 3_600. / Self::LON_SEC;
+    fn weight(self, p: &LatLon) -> [f64; 2] {
+        let southeast = self.to_degree();
+        let weight_lat = (southeast.lat() - p.lat()).abs() * 3_600. / Self::LAT_SEC;
+        let weight_lon = (southeast.lon() - p.lon()).abs() * 3_600. / Self::LON_SEC;
         [weight_lat, weight_lon]
     }
     fn to_north(mut self) -> Self {
@@ -97,10 +102,10 @@ impl Mesh3 {
         self.lon += 1;
         self
     }
-    fn to_degree(self) -> Degree_ {
+    fn to_degree(self) -> LatLon {
         let lat = f64::from(self.lat) * Self::LAT_SEC / 3_600.;
         let lon = f64::from(self.lat) * Self::LON_SEC / 3_600.;
-        Degree_::new_unchecked(lat, lon)
+        LatLon(lat, lon)
     }
 }
 
@@ -111,10 +116,10 @@ pub struct MicroSecond {
     lon: i32,
 }
 impl MicroSecond {
-    fn to_degree(self) -> Degree_ {
+    fn to_degree(self) -> LatLon {
         let lat = f64::from(self.lat) / 3_600_000.;
         let lon = f64::from(self.lon) / 3_600_000.;
-        Degree_::new_unchecked(lat, lon)
+        LatLon(lat, lon)
     }
 }
 
@@ -161,9 +166,8 @@ mod tests {
             },
         ];
         let sut = Grid::new(&dots);
-        let xy = sut.interpolate(Degree_::new([0., 0.]));
-        let [x, y] = xy.unwrap().xy();
-        assert_eq!(x, 0.0);
-        assert_eq!(y, -6. / 3_600_000_000.);
+        let ret = sut.interpolate(LatLon(0., 0.)).unwrap();
+        assert_eq!(ret.lon(), 0.0);
+        assert_eq!(ret.lat(), -6. / 3_600_000_000.);
     }
 }
