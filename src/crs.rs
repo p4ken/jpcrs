@@ -1,22 +1,28 @@
-use crate::Geodetic;
+use crate::{Geodetic, LatLon, LonLat};
 
-pub fn from_tokyo<T: Geodetic>(degree: T) -> Tokyo<T> {
-    Tokyo::new(degree)
+pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
+    Tokyo {
+        lat_lon: LatLon(lat, lon),
+    }
 }
 
 /// 旧日本測地系。
 /// Tokyo Datum, the older Japanese Datum.
 ///
 /// EPSG: 4301
-pub struct Tokyo<T> {
-    geodetic: T,
+pub struct Tokyo {
+    lat_lon: LatLon,
 }
-impl<T: Geodetic> Tokyo<T> {
+impl Tokyo {
     // Bessel楕円体
 
-    // Tokyo::new(jgd2000) のように、これだけで変換できると誤認しうるので、公開しない。
-    fn new(geodetic: T) -> Self {
-        Self { geodetic }
+    pub fn new(degree: impl Into<LatLon>) -> Self {
+        let lat_lon = degree.into();
+        Self { lat_lon }
+    }
+
+    pub fn with_lon_lat(degree: impl Into<LonLat>) -> Self {
+        Self::new(degree.into())
     }
 
     // pub fn with_xy(xy: impl Into<XY>) -> Self {
@@ -28,19 +34,18 @@ impl<T: Geodetic> Tokyo<T> {
     ///
     /// パラメータグリッドの範囲外の場合は、3パラメータにフォールバックする。
     #[cfg(feature = "tky2jgd")]
-    pub fn to_jgd2000(&self) -> Jgd2000<T> {
+    pub fn to_jgd2000(&self) -> Jgd2000 {
         // 国土地理院時報(2002，97集)「世界測地系移行のための座標変換ソフトウェア”TKY2JGD"」
         // https://www.gsi.go.jp/common/000063173.pdf
         // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する。
-        let latlon = self.geodetic.into();
-        match crate::TKY2JGD.interpolate(latlon) {
-            Some(shift) => Jgd2000::new(T::from(latlon + shift)),
+        match crate::TKY2JGD.interpolate(self.lat_lon) {
+            Some(shift) => Jgd2000::new(self.lat_lon + shift),
             None => self.to_tokyo97().to_jgd2000(),
         }
     }
 
     /// 離島位置の補正量を用いて [`Tokyo97`] へ変換する
-    pub fn to_tokyo97(&self) -> Tokyo97<T> {
+    pub fn to_tokyo97(&self) -> Tokyo97 {
         // 日本測地系における離島位置の補正量
         // https://www.jstage.jst.go.jp/article/sokuchi1954/49/3/49_3_181/_pdf
         todo!()
@@ -52,12 +57,12 @@ impl<T: Geodetic> Tokyo<T> {
 ///
 /// 3パラメータを用いた変換式[^1]で定義される旧日本測地系。
 /// [^1]: [飛田幹男(1997) 最近の測地座標系と座標変換についての考察](https://www.jstage.jst.go.jp/article/sokuchi1954/43/4/43_4_231/_pdf)
-pub struct Tokyo97<T> {
-    geodetic: T,
+pub struct Tokyo97 {
+    lat_lon: LatLon,
 }
-impl<T: Geodetic> Tokyo97<T> {
+impl Tokyo97 {
     /// 3パラメータを用いて [`JGD2000`] へ変換する
-    pub fn to_jgd2000(&self) -> Jgd2000<T> {
+    pub fn to_jgd2000(&self) -> Jgd2000 {
         todo!()
     }
 
@@ -72,19 +77,20 @@ impl<T: Geodetic> Tokyo97<T> {
 /// JGD2000, Japanese Geodetic Datum 2000.
 ///
 /// EPSG: 4612
-pub struct Jgd2000<T> {
-    geodetic: T,
+pub struct Jgd2000 {
+    lat_lon: LatLon,
 }
 
-impl<T: Geodetic> Jgd2000<T> {
+impl Jgd2000 {
     // GRS80楕円体
 
-    fn new(geodetic: T) -> Self {
-        Self { geodetic }
+    pub fn new(degree: impl Into<LatLon>) -> Self {
+        let lat_lon = degree.into();
+        Self { lat_lon }
     }
 
     /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2011`] へ変換する
-    pub fn to_jgd2011(&self) -> Jgd2011<T> {
+    pub fn to_jgd2011(&self) -> Jgd2011 {
         // 地震時地殻変動に伴う座標値の変化を補正するソフトウェア“PatchJGD”
         // https://www.jstage.jst.go.jp/article/sokuchi/55/4/55_4_355/_pdf/-char/ja
         todo!()
@@ -106,12 +112,16 @@ impl<T: Geodetic> Jgd2000<T> {
 /// JGD2011, Japanese Geodetic Datum 2011.
 ///
 /// EPSG: 6668
-pub struct Jgd2011<T> {
-    geodetic: T,
+pub struct Jgd2011 {
+    lat_lon: LatLon,
 }
-impl<T: Geodetic> Jgd2011<T> {
-    pub fn inner(&self) -> (f64, f64) {
-        self.geodetic.degrees()
+impl Jgd2011 {
+    pub fn lat_lon(&self) -> (f64, f64) {
+        todo!()
+    }
+
+    pub fn lon_lat(&self) -> (f64, f64) {
+        todo!()
     }
 
     // pub fn lonlat(&self) -> (f64, f64) {

@@ -101,12 +101,12 @@ impl From<LatLon> for LonLat {
 //         (lat, lon)
 //     }
 // }
-// impl<T: Into<(f64, f64)>> From<T> for LonLat {
-//     fn from(lonlat: T) -> Self {
-//         let (lon, lat) = lonlat.into();
-//         Self((lon, lat))
-//     }
-// }
+impl<T: Into<(f64, f64)>> From<T> for LonLat {
+    fn from(lonlat: T) -> Self {
+        let (lon, lat) = lonlat.into();
+        Self(lon, lat)
+    }
+}
 
 pub struct ECEF {}
 impl ECEF {
