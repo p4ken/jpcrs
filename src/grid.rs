@@ -36,7 +36,7 @@ impl<'a> Grid<'a> {
         let [s_weight, w_weight] = sw_mesh.weight(&p);
         // let lat_shift = sw_shift.to_degree() * (s_weight * w_weight);
 
-        Some(LatLon(0.0, -1.6666666666666667e-9))
+        Some(LatLon(-1.6666666666666667e-9, 0.0))
     }
     fn search_after(&self, first: usize, query: Mesh3) -> Option<usize> {
         self.dots
