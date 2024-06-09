@@ -1,10 +1,12 @@
-use crate::{Geodetic, LatLon, LonLat};
+use crate::LatLon;
 
 pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
-    Tokyo {
-        lat_lon: LatLon(lat, lon),
-    }
+    Tokyo::new(LatLon(lat, lon))
 }
+
+// pub fn from_tokyo_(p: impl Into<LatLon>) -> Tokyo {
+//     Tokyo(p.into())
+// }
 
 /// 旧日本測地系。
 /// Tokyo Datum, the older Japanese Datum.
@@ -16,14 +18,14 @@ pub struct Tokyo {
 impl Tokyo {
     // Bessel楕円体
 
-    pub fn new(degree: impl Into<LatLon>) -> Self {
-        let lat_lon = degree.into();
+    fn new(lat_lon: impl Into<LatLon>) -> Self {
+        let lat_lon = lat_lon.into();
         Self { lat_lon }
     }
 
-    pub fn with_lon_lat(degree: impl Into<LonLat>) -> Self {
-        Self::new(degree.into())
-    }
+    // pub fn with_lon_lat(degree: impl Into<LonLat>) -> Self {
+    //     Self::new(degree.into())
+    // }
 
     // pub fn with_xy(xy: impl Into<XY>) -> Self {
     //     let XY(x, y) = xy.into();
@@ -117,16 +119,12 @@ pub struct Jgd2011 {
 }
 impl Jgd2011 {
     pub fn lat_lon(&self) -> (f64, f64) {
-        todo!()
+        self.lat_lon.into()
     }
 
     pub fn lon_lat(&self) -> (f64, f64) {
-        todo!()
+        self.lat_lon.rev()
     }
-
-    // pub fn lonlat(&self) -> (f64, f64) {
-    //     todo!()
-    // }
 
     /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2000`] へ逆変換する
     pub fn to_jgd2000(&self) {}

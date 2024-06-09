@@ -18,6 +18,12 @@ impl<'a> Grid<'a> {
     pub const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
+
+    /// バイリニア補間。
+    /// Bilinear interpolation.
+    ///
+    /// 指定された座標が属する3次メッシュの四隅すべてのパラメータがグリッド内に存在しなければならない。
+    /// 一つでも欠けていた場合は `None` を返す。
     pub fn interpolate(&self, p: LatLon) -> Option<LatLon> {
         let mesh = Mesh3::floor(p);
         let i = self.search_after(0, mesh)?;
@@ -35,7 +41,7 @@ impl<'a> Grid<'a> {
         let LatLon(n_weight, e_weight) = mesh.diagonal_weight(p);
         let LatLon(s_weight, w_weight) = mesh.north().east().diagonal_weight(p);
 
-        // bilinear interpolation by weighted mean
+        // weighted mean
         let shift = sw_shift.to_degree() * s_weight * w_weight
             + se_shift.to_degree() * s_weight * e_weight
             + nw_shift.to_degree() * n_weight * w_weight

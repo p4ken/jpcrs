@@ -8,7 +8,6 @@
 //! 有効にすると、ビルド後のバイナリサイズが増える。
 //!
 //! - `tky2jgd` - [TKY2JGD] を使用する。デフォルトで有効。
-//!
 //! - `patchjgd` - [TOUHOKUTAIHEIYOUOKI2011] を使用する。デフォルトで有効。
 
 mod coord;
@@ -17,8 +16,7 @@ mod grid;
 mod island;
 mod par;
 
-use coord::Geodetic;
-pub use coord::{LatLon, LonLat};
+use coord::{LatLon, LonLat};
 pub use crs::{from_tokyo, Jgd2000, Jgd2011, Tokyo, Tokyo97};
 pub use grid::Grid;
 #[cfg(feature = "tky2jgd")]

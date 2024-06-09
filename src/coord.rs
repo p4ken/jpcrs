@@ -2,12 +2,18 @@ use std::ops::{Add, Mul, Sub};
 
 /// 測地座標。
 /// Geodetic coordinate.
-pub trait Geodetic: Copy + From<LatLon> + Into<LatLon> {
-    // fn from_degrees(_: f64, _: f64) -> Self;
-    /// 度単位の値のペア。
-    fn degrees(&self) -> (f64, f64);
-    // fn to_latlon(&self) -> LatLon;
-}
+// pub trait Geodetic: Sized {
+//     fn with_lat_lon(lat_lon: (f64, f64)) -> Self;
+//     fn lat_lon(&self) -> (f64, f64);
+//     fn with_lon_lat(lon_lat: (f64, f64)) -> Self {
+//         let (lon, lat) = lon_lat;
+//         Self::with_lat_lon((lat, lon))
+//     }
+//     fn lon_lat(&self) -> (f64, f64) {
+//         let (lat, lon) = self.lat_lon();
+//         (lon, lat)
+//     }
+// }
 
 // mod seal {
 //     pub trait Sealed {}
@@ -20,27 +26,27 @@ pub trait Geodetic: Copy + From<LatLon> + Into<LatLon> {
 #[derive(Debug, Clone, Copy)]
 pub struct LatLon(pub f64, pub f64);
 impl LatLon {
-    // pub fn new(lat: f64, lon: f64) -> Self {
-    //     Self(lat, lon)
-    // }
+    pub fn new(lat_lon: impl Into<(f64, f64)>) -> Self {
+        let (lat, lon) = lat_lon.into();
+        Self(lat, lon)
+    }
+    pub fn new_rev(lon_lat: impl Into<(f64, f64)>) -> Self {
+        let (lon, lat) = lon_lat.into();
+        Self(lat, lon)
+    }
     pub fn lat(&self) -> f64 {
         self.0
     }
     pub fn lon(&self) -> f64 {
         self.1
     }
+    pub fn rev(&self) -> (f64, f64) {
+        (self.lon(), self.lat())
+    }
     // // これだと取り出す時に再度逆転させる必要がある。
     // pub fn from_lonlat(lonlat: impl Into<(f64, f64)>) -> Self {
     //     let (lon, lat) = lonlat.into();
     //     Self(lat, lon)
-    // }
-}
-impl Geodetic for LatLon {
-    fn degrees(&self) -> (f64, f64) {
-        (self.0, self.1)
-    }
-    // fn to_latlon(&self) -> LatLon {
-    //     self.clone()
     // }
 }
 impl From<LonLat> for LatLon {
@@ -66,11 +72,11 @@ impl Mul<f64> for LatLon {
         Self(self.0 * rhs, self.1 * rhs)
     }
 }
-// impl From<LatLon> for (f64, f64) {
-//     fn from(LatLon(lat, lon): LatLon) -> Self {
-//         (lat, lon)
-//     }
-// }
+impl From<LatLon> for (f64, f64) {
+    fn from(value: LatLon) -> Self {
+        todo!()
+    }
+}
 
 /// 度単位の経度と緯度のペア。
 /// Longitude and latitude in degrees.
@@ -82,31 +88,17 @@ impl LonLat {
         Self(lon, lat)
     }
 }
-impl Geodetic for LonLat {
-    fn degrees(&self) -> (f64, f64) {
-        (self.0, self.1)
-    }
-    // fn to_latlon(&self) -> LatLon {
-    //     let (lon, lat) = self.0;
-    //     LatLon(lat, lon)
-    // }
-}
-impl From<LatLon> for LonLat {
-    fn from(LatLon(lat, lon): LatLon) -> Self {
-        Self(lon, lat)
-    }
-}
-// impl From<LonLat> for (f64, f64) {
-//     fn from(LonLat((lon, lat)): LonLat) -> Self {
-//         (lat, lon)
+// impl From<LatLon> for LonLat {
+//     fn from(LatLon(lat, lon): LatLon) -> Self {
+//         Self(lon, lat)
 //     }
 // }
-impl<T: Into<(f64, f64)>> From<T> for LonLat {
-    fn from(lonlat: T) -> Self {
-        let (lon, lat) = lonlat.into();
-        Self(lon, lat)
-    }
-}
+// impl<T: Into<(f64, f64)>> From<T> for LonLat {
+//     fn from(lonlat: T) -> Self {
+//         let (lon, lat) = lonlat.into();
+//         Self(lon, lat)
+//     }
+// }
 
 pub struct ECEF {}
 impl ECEF {
