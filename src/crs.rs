@@ -60,7 +60,9 @@ impl Tokyo {
 /// Tokyo97 座標系。
 /// Tokyo97, the older Japanese Datum.
 ///
-/// 3パラメータを用いた変換式 ([飛田幹男, 1997](crate#references)) で定義される旧日本測地系。
+/// 3パラメータを用いた変換式で定義される[^1]旧日本測地系。
+///
+/// [^1]: 飛田幹男 [最近の測地座標系と座標変換についての考察](https://www.jstage.jst.go.jp/article/sokuchi1954/43/4/43_4_231/_pdf) (測地学会誌 43巻 4号 (1997) pp231-235)
 pub struct Tokyo97 {
     lat_lon: LatLon,
 }

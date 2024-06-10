@@ -2,13 +2,13 @@ use crate::{par, LatLon};
 
 /// 日本測地系から世界測地系への座標変換パラメータ。
 ///
-/// [国土地理院, 2003](crate#references) をもとに作成。
+/// 出典: 国土地理院 [TKY2JGD.par](https://www.gsi.go.jp/sokuchikijun/tky2jgd_download.html) (Ver.2.1.2) を加工して作成。
 #[cfg(feature = "tky2jgd")]
 pub const TKY2JGD: Grid = par::TKY2JGD.to_grid();
 
 /// 平成23年(2011年)東北地方太平洋沖地震の座標補正パラメータ。
 ///
-/// [国土地理院, 2017](crate#references) をもとに作成。
+/// 出典: 国土地理院 [touhokutaiheiyouoki2011.par](https://www.gsi.go.jp/sokuchikijun/sokuchikijun41012.html) (Ver.4.0.0) を加工して作成。
 #[cfg(feature = "patchjgd")]
 pub const TOUHOKUTAIHEIYOUOKI2011: Grid = par::TOUHOKUTAIHEIYOUOKI2011.to_grid();
 
