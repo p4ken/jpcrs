@@ -126,9 +126,9 @@ impl Jgd2011 {
         self.lat_lon.into()
     }
 
-    pub fn lon_lat(&self) -> (f64, f64) {
-        self.lat_lon.rev()
-    }
+    // pub fn lon_lat(&self) -> (f64, f64) {
+    //     self.lat_lon.rev()
+    // }
 
     /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2000`] へ逆変換する
     pub fn to_jgd2000(&self) {}

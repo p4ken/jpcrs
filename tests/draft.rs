@@ -1,6 +1,6 @@
 #![cfg(feature = "default")]
 
-use geo::Point;
+use geo::{Coord, Line, MapCoords, Point};
 use jgd::Tokyo;
 
 fn api_usage() {
@@ -12,10 +12,9 @@ fn api_usage() {
         .to_jgd2011()
         .lat_lon();
 
-    let p = Point::from([2.0, 1.0]);
-    let Point(_) = jgd::from_tokyo(p.y(), p.x())
-        .to_jgd2000()
-        .to_jgd2011()
-        .lon_lat()
-        .into();
+    let line = Line::new([0., 0.].into(), [2., 1.]);
+    let line = line.map_coords(|Coord { x, y }| {
+        let (y, x) = jgd::from_tokyo(y, x).to_jgd2000().to_jgd2011().lat_lon();
+        Coord { x, y }
+    });
 }
