@@ -22,7 +22,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build
-      run: make
+      run: make test
 
   publish:
     if: "${{ inputs.bump }}"
