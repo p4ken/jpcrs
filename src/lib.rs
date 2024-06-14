@@ -1,4 +1,7 @@
-//! 日本の座標の測地系を変換する。
+// doc requres nightly
+#![cfg_attr(all(doc, not(doctest)), feature(doc_auto_cfg))]
+
+//! 日本国内の測地系を変換する。
 //! Transform geodetic coordinate systems used in Japan.
 //!
 //! # Examples
@@ -15,14 +18,14 @@
 //!
 //! <br>
 //!
-//! [`geo::geometry`] の測地系を変換する。
+//! [`geo`](https://docs.rs/geo/latest/geo/index.html#types) クレートの測地系を変換する。
 //!
 //! ```no_run
 //! use geo::{Coord, LineString, MapCoords};
 //!
 //! let tokyo_datum = LineString::from(vec![(135.0, 35.0), (135.1, 35.1)]);
 //! let jgd2011 = tokyo_datum.map_coords(|Coord { x, y }| {
-//!     // 順序に注意: lat, lon <-> y, x
+//!     // 順序に注意: lat, lon <=> y, x
 //! #   #[cfg(all(feature = "tky2jgd", feature = "patchjgd"))]
 //!     let (y, x) = jgd::from_tokyo(y, x).to_jgd2000().to_jgd2011().lat_lon();
 //!     Coord { x, y }
@@ -31,7 +34,7 @@
 //!
 //! # Limitations
 //!
-//! 日本国内の陸地の座標を対象としている。海上や国外には適さない。
+//! 国内の陸地を対象としている。海上や国外の座標には適さない。
 //!
 //! 測地系変換によって、ある測地系で測量、作成された座標を、あたかも別の測地系かのように「再現」できる。
 //! 異なる測地系で整備された座標同士のズレを「低減」できても、ズレが消滅することはない。
