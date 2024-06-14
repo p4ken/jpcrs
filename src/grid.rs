@@ -88,8 +88,8 @@ impl Mesh3 {
     fn floor(degree: LatLon) -> Self {
         // "saturating cast" since Rust 1.45.0
         // https://blog.rust-lang.org/2020/07/16/Rust-1.45.0.html#fixing-unsoundness-in-casts
-        let lat = (degree.lat() / 120.) as i16;
-        let lon = (degree.lon() / 80.) as i16;
+        let lat = (degree.lat() * 120.) as i16;
+        let lon = (degree.lon() * 80.) as i16;
         Self { lat, lon }
     }
     fn diagonal_weight(self, p: LatLon) -> LatLon {
@@ -139,7 +139,7 @@ mod tests {
 
         let r = records.last().unwrap();
         assert_eq!(r.mesh.lat, 5463);
-        assert_eq!(r.mesh.lon, 3356);
+        assert_eq!(r.mesh.lon, 11356);
         assert_eq!(r.shift.lat, 7875320);
         assert_eq!(r.shift.lon, -13995610);
     }
@@ -180,8 +180,9 @@ mod tests {
     #[test]
     fn grid_interpolate_middle() {
         let sut = Grid::new(&SMALLEST);
+        let exp = LatLon::from_micro_secs(-2, 2);
         let ret = sut.interpolate(LatLon::from_secs(10., 15.)).unwrap();
-        let diff = (ret - LatLon::from_micro_secs(-2, 2)).abs();
+        let diff = (ret - exp).abs();
         assert!(diff.lat() < MILLI_METER_IN_DEGREES);
         assert!(diff.lon() < MILLI_METER_IN_DEGREES);
     }

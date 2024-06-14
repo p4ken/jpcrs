@@ -2,7 +2,7 @@
 all: TKY2JGD.in touhokutaiheiyouoki2011.in
 
 %.in: %.par
-	cargo run --package conv < $*.par > $*.in
+	cargo run --package conv < $*.par > $*.in 2> $*.in.log
 
 %.par: %.zip
 	unzip -p $*.zip > $@

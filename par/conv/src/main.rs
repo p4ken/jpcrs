@@ -67,7 +67,7 @@ impl FromStr for Record {
                 .context("grid overflowed")
         }
         let index_lat = to_grid_index(mesh1_lat, mesh2_lat, mesh3_lat).expect("lat");
-        let index_lon = to_grid_index(mesh1_lon, mesh2_lon, mesh3_lon).expect("lon");
+        let index_lon = to_grid_index(mesh1_lon + 100, mesh2_lon, mesh3_lon).expect("lon");
 
         fn parse_diff(line: &mut &str) -> anyhow::Result<i32> {
             let d_integer = parse_number(line, 4)?;
@@ -89,8 +89,8 @@ impl FromStr for Record {
 }
 impl Display for Record {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = format!("{:04},{:04},{:09},{:09}", self.0, self.1, self.2, self.3);
-        assert_eq!(s.len(), 29, "{}", s);
+        let s = format!("{:05},{:05},{:09},{:09}", self.0, self.1, self.2, self.3);
+        assert_eq!(s.len(), 31, "{}", s);
         f.write_str(&s)
     }
 }

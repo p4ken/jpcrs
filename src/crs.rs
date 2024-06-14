@@ -128,7 +128,8 @@ impl Jgd2000 {
     /// ただし、今後のバージョンアップで他のいくつかの地殻変動分を追加する可能性がある。
     /// いずれにしても ...
     pub fn to_jgd2011(&self) -> Jgd2011 {
-        todo!()
+        // todo
+        Jgd2011::new(self.lat_lon)
     }
 
     /// [`TKY2JGD`] を用いて [`Tokyo`] へ逆変換する。

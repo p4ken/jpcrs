@@ -62,11 +62,6 @@ impl LatLon {
         self
     }
 }
-impl From<LonLat> for LatLon {
-    fn from(LonLat(lon, lat): LonLat) -> Self {
-        Self(lat, lon)
-    }
-}
 impl Add<LatLon> for LatLon {
     type Output = Self;
     fn add(self, rhs: LatLon) -> Self::Output {
@@ -86,32 +81,10 @@ impl Mul<f64> for LatLon {
     }
 }
 impl From<LatLon> for (f64, f64) {
-    fn from(value: LatLon) -> Self {
-        todo!()
+    fn from(LatLon(lat, lon): LatLon) -> Self {
+        (lat, lon)
     }
 }
-
-/// 度単位の経度と緯度のペア。
-/// Longitude and latitude in degrees.
-#[derive(Debug, Clone, Copy)]
-pub struct LonLat(f64, f64);
-impl LonLat {
-    pub fn new(lonlat: impl Into<(f64, f64)>) -> Self {
-        let (lon, lat) = lonlat.into();
-        Self(lon, lat)
-    }
-}
-// impl From<LatLon> for LonLat {
-//     fn from(LatLon(lat, lon): LatLon) -> Self {
-//         Self(lon, lat)
-//     }
-// }
-// impl<T: Into<(f64, f64)>> From<T> for LonLat {
-//     fn from(lonlat: T) -> Self {
-//         let (lon, lat) = lonlat.into();
-//         Self(lon, lat)
-//     }
-// }
 
 pub struct ECEF {}
 impl ECEF {
