@@ -5,7 +5,8 @@
 //!
 //! 旧日本測地系 [`Tokyo`] の北緯35度・東経135度を、世界測地系 [`Jgd2011`] に変換する。
 //!
-//! ```
+//! ```no_run
+//! # #[cfg(all(feature = "tky2jgd", feature = "patchjgd"))]
 //! let (lat, lon) = jgd::from_tokyo(35.0, 135.0)
 //!     .to_jgd2000()
 //!     .to_jgd2011()
@@ -16,12 +17,13 @@
 //!
 //! [`geo::geometry`] の測地系を変換する。
 //!
-//! ```
+//! ```no_run
 //! use geo::{Coord, LineString, MapCoords};
 //!
 //! let tokyo_datum = LineString::from(vec![(135.0, 35.0), (135.1, 35.1)]);
 //! let jgd2011 = tokyo_datum.map_coords(|Coord { x, y }| {
 //!     // 順序に注意: lat, lon <-> y, x
+//! #   #[cfg(all(feature = "tky2jgd", feature = "patchjgd"))]
 //!     let (y, x) = jgd::from_tokyo(y, x).to_jgd2000().to_jgd2011().lat_lon();
 //!     Coord { x, y }
 //! });
