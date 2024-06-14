@@ -88,8 +88,8 @@ impl Mesh3 {
     fn floor(degree: LatLon) -> Self {
         // "saturating cast" since Rust 1.45.0
         // https://blog.rust-lang.org/2020/07/16/Rust-1.45.0.html#fixing-unsoundness-in-casts
-        let lat = (degree.lat() * 120.) as i16;
-        let lon = (degree.lon() * 80.) as i16;
+        let lat = (degree.lat() / 120.) as i16;
+        let lon = (degree.lon() / 80.) as i16;
         Self { lat, lon }
     }
     fn diagonal_weight(self, p: LatLon) -> LatLon {
@@ -133,7 +133,7 @@ mod tests {
 
     #[cfg(feature = "tky2jgd")]
     #[test]
-    fn tky2jgd_grid() {
+    fn grid_tky2jgd() {
         let records = TKY2JGD.dots;
         assert_eq!(records.len(), 392323);
 
@@ -144,34 +144,45 @@ mod tests {
         assert_eq!(r.shift.lon, -13995610);
     }
 
+    const MILLI_METER_IN_DEGREES: f64 = 0.000000009;
+
+    //         45"
+    //  (0, 0) -- (6, 6)    2    1
+    //    |         | 30"
+    //  (0,-6) -- (6, 0)    4    2
+    const SMALLEST: &[Dot] = &[
+        Dot {
+            mesh: Mesh3 { lon: 0, lat: 0 },
+            shift: MicroSecond { lon: 0, lat: -6 },
+        },
+        Dot {
+            mesh: Mesh3 { lon: 1, lat: 0 },
+            shift: MicroSecond { lon: 6, lat: 0 },
+        },
+        Dot {
+            mesh: Mesh3 { lon: 0, lat: 1 },
+            shift: MicroSecond { lon: 0, lat: 0 },
+        },
+        Dot {
+            mesh: Mesh3 { lon: 1, lat: 1 },
+            shift: MicroSecond { lon: 6, lat: 6 },
+        },
+    ];
+
     #[test]
-    fn grid_interpolate() {
-        //
-        //  (0, 0) -- (6, 6)
-        //    |         |
-        //  (0,-6) -- (6, 0)
-        //
-        let dots = [
-            Dot {
-                mesh: Mesh3 { lon: 0, lat: 0 },
-                shift: MicroSecond { lon: 0, lat: -6 },
-            },
-            Dot {
-                mesh: Mesh3 { lon: 1, lat: 0 },
-                shift: MicroSecond { lon: 6, lat: 0 },
-            },
-            Dot {
-                mesh: Mesh3 { lon: 0, lat: 1 },
-                shift: MicroSecond { lon: 0, lat: 0 },
-            },
-            Dot {
-                mesh: Mesh3 { lon: 1, lat: 1 },
-                shift: MicroSecond { lon: 6, lat: 6 },
-            },
-        ];
-        let sut = Grid::new(&dots);
-        let ret = sut.interpolate(LatLon(0., 0.)).unwrap();
+    fn grid_interpolate_corner() {
+        let sut = Grid::new(&SMALLEST);
+        let ret = sut.interpolate(LatLon(0.0, 0.0)).unwrap();
         assert_eq!(ret.lon(), 0.0);
         assert_eq!(ret.lat(), -6. / 3_600_000_000.);
+    }
+
+    #[test]
+    fn grid_interpolate_middle() {
+        let sut = Grid::new(&SMALLEST);
+        let ret = sut.interpolate(LatLon::from_secs(10., 15.)).unwrap();
+        let diff = (ret - LatLon::from_micro_secs(-2, 2)).abs();
+        assert!(diff.lat() < MILLI_METER_IN_DEGREES);
+        assert!(diff.lon() < MILLI_METER_IN_DEGREES);
     }
 }

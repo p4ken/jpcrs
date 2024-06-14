@@ -21,33 +21,46 @@ use std::ops::{Add, Mul, Sub};
 //     impl Sealed for super::LonLat {}
 // }
 
-/// 度単位の緯度と経度のペア。
+/// 度単位の緯度経度。
 /// Latitude and longitude in degrees.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct LatLon(pub f64, pub f64);
 impl LatLon {
-    pub fn new(lat_lon: impl Into<(f64, f64)>) -> Self {
-        let (lat, lon) = lat_lon.into();
+    pub fn from_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
+        let [lat, lon] = [lat, lon].map(|x| x.into() / 3_600.);
         Self(lat, lon)
     }
-    pub fn new_rev(lon_lat: impl Into<(f64, f64)>) -> Self {
-        let (lon, lat) = lon_lat.into();
-        Self(lat, lon)
+    pub fn from_milli_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
+        Self::from_secs(lat, lon) * 0.001
     }
+    pub fn from_micro_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
+        Self::from_milli_secs(lat, lon) * 0.001
+    }
+    // pub fn new(lat_lon: impl Into<(f64, f64)>) -> Self {
+    //     let (lat, lon) = lat_lon.into();
+    //     Self(lat, lon)
+    // }
+    // pub fn new_rev(lon_lat: impl Into<(f64, f64)>) -> Self {
+    //     let (lon, lat) = lon_lat.into();
+    //     Self(lat, lon)
+    // }
     pub fn lat(&self) -> f64 {
         self.0
     }
     pub fn lon(&self) -> f64 {
         self.1
     }
-    pub fn rev(&self) -> (f64, f64) {
-        (self.lon(), self.lat())
-    }
-    // // これだと取り出す時に再度逆転させる必要がある。
-    // pub fn from_lonlat(lonlat: impl Into<(f64, f64)>) -> Self {
-    //     let (lon, lat) = lonlat.into();
-    //     Self(lat, lon)
+    // pub fn rev(&self) -> (f64, f64) {
+    //     (self.lon(), self.lat())
     // }
+    pub fn abs(self) -> Self {
+        self.map(f64::abs)
+    }
+    pub fn map(mut self, f: fn(f64) -> f64) -> Self {
+        self.0 = f(self.0);
+        self.1 = f(self.1);
+        self
+    }
 }
 impl From<LonLat> for LatLon {
     fn from(LonLat(lon, lat): LonLat) -> Self {
