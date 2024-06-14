@@ -106,8 +106,8 @@ pub struct Jgd2000 {
 impl Jgd2000 {
     // GRS80楕円体
 
-    fn new(degree: impl Into<LatLon>) -> Self {
-        let lat_lon = degree.into();
+    fn new(lat_lon: impl Into<LatLon>) -> Self {
+        let lat_lon = lat_lon.into();
         Self { lat_lon }
     }
 
@@ -138,6 +138,11 @@ pub struct Jgd2011 {
     lat_lon: LatLon,
 }
 impl Jgd2011 {
+    fn new(lat_lon: impl Into<LatLon>) -> Self {
+        let lat_lon = lat_lon.into();
+        Self { lat_lon }
+    }
+
     pub fn lat_lon(&self) -> (f64, f64) {
         self.lat_lon.into()
     }
