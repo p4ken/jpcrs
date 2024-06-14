@@ -2,11 +2,11 @@
 #![cfg_attr(all(doc, not(doctest)), feature(doc_auto_cfg))]
 
 //! 日本国内の測地系を変換する。
-//! Transform geodetic coordinate systems used in Japan.
+//! Transform datums used in Japan.
 //!
 //! # Examples
 //!
-//! 旧日本測地系 [`Tokyo`] の北緯35度・東経135度を、世界測地系 [`Jgd2011`] に変換する。
+//! 旧日本測地系 [`Tokyo`] の北緯35度・東経135度を、世界測地系 [`Jgd2011`] に変換する例。
 //!
 //! ```no_run
 //! # #[cfg(all(feature = "tky2jgd", feature = "patchjgd"))]
@@ -18,7 +18,7 @@
 //!
 //! <br>
 //!
-//! [`geo`](https://docs.rs/geo/latest/geo/index.html#types) クレートの測地系を変換する。
+//! [`geo`](https://docs.rs/geo/latest/geo/index.html#types) クレートの測地系を変換する例。
 //!
 //! ```no_run
 //! use geo::{Coord, LineString, MapCoords};
@@ -37,10 +37,10 @@
 //! 国内の陸地を対象としている。海上や国外の座標には適さない。
 //!
 //! 測地系変換によって、ある測地系で測量、作成された座標を、あたかも別の測地系かのように「再現」できる。
-//! 異なる測地系で整備された座標同士のズレを「低減」できても、ズレが消滅することはない。
+//! 異なる測地系で整備された座標同士のズレを低減できても、ズレが消滅することはない。
 //! 変換メソッド毎に精度や制約が異なり、詳細はそれぞれのドキュメントに記載されている。
 //!
-//! 度単位の緯度経度のみ変換可能。平面直角座標系は未対応。
+//! 度単位の緯度経度のみ変換可能。度分秒(DMS)、平面直角座標系(XY)は未対応。
 //!
 //! # Features
 //!

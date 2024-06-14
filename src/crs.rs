@@ -6,6 +6,16 @@ use crate::TKY2JGD;
 #[cfg(feature = "patchjgd")]
 use crate::TOUHOKUTAIHEIYOUOKI2011;
 
+/// 旧日本測地系からの変換を開始する。
+/// Transform from Tokyo Datum.
+///
+/// 世界測地系で測量された座標の場合は、[`Tokyo97`] ...
+///
+/// # Examples
+///
+/// ```
+/// jgd::from_tokyo(35.0, 135.0);
+/// ```
 pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
     Tokyo::new(LatLon(lat, lon))
 }
@@ -27,8 +37,7 @@ pub fn from_jgd2011(lat: f64, lon: f64) -> Jgd2000 {
 //     Tokyo(p.into())
 // }
 
-/// 旧日本測地系。
-/// Tokyo Datum, The older Japanese Datum.
+/// 旧日本測地系。Tokyo Datum, The older Japanese Datum.
 ///
 /// EPSG: 4301
 pub struct Tokyo {
@@ -78,8 +87,7 @@ impl Tokyo {
     }
 }
 
-/// 旧日本測地系。
-/// Tokyo 97, The older Japanese Datum.
+/// 旧日本測地系。Tokyo 97, The older Japanese Datum.
 ///
 /// 世界測地系を基準に、3パラメータによる変換式で定義された測地系 [(飛田, 1997)](crate#references)。
 pub struct Tokyo97 {
@@ -87,16 +95,17 @@ pub struct Tokyo97 {
 }
 impl Tokyo97 {
     /// 3パラメータによる変換式 [(飛田, 1997)](crate#references) を用いて [`Jgd2000`] へ変換する。
+    /// Transform to JGD2000.
     pub fn to_jgd2000(&self) -> Jgd2000 {
         todo!()
     }
 
     /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo`] へ逆変換する。
+    /// Inverse of [`Tokyo::to_tokyo97`].
     pub fn to_tokyo(&self) {}
 }
 
-/// 世界測地系 JGD2000.
-/// Japanese Geodetic Datum 2000.
+/// 世界測地系。Japanese Geodetic Datum 2000 (JGD2000).
 ///
 /// EPSG: 4612
 pub struct Jgd2000 {
@@ -113,7 +122,11 @@ impl Jgd2000 {
 
     /// [`TOUHOKUTAIHEIYOUOKI2011`] を用いて [`Jgd2011`] へ変換する。
     ///
-    /// パラメータグリッド内の一部地域に欠損があり、
+    /// パラメータグリッド内の一部地域に欠損があり、...
+    ///
+    /// 現在のところ、東日本大震災による地殻変動分しか補正されない。
+    /// ただし、今後のバージョンアップで他のいくつかの地殻変動分を追加する可能性がある。
+    /// いずれにしても ...
     pub fn to_jgd2011(&self) -> Jgd2011 {
         todo!()
     }
@@ -130,8 +143,7 @@ impl Jgd2000 {
     pub fn to_tokyo97(&self) {}
 }
 
-/// 世界測地系 JGD2011.
-/// Japanese Geodetic Datum 2011.
+/// 世界測地系。Japanese Geodetic Datum 2011 (JGD2011).
 ///
 /// EPSG: 6668
 pub struct Jgd2011 {
@@ -143,6 +155,8 @@ impl Jgd2011 {
         Self { lat_lon }
     }
 
+    /// 度単位の緯度経度。
+    /// Latitude and longitude in degrees.
     pub fn lat_lon(&self) -> (f64, f64) {
         self.lat_lon.into()
     }
