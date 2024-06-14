@@ -29,7 +29,7 @@ impl<'a> Grid<'a> {
     /// 指定された座標が属する3次メッシュの四隅すべてのパラメータがグリッド内に存在しなければならない。
     /// 一つでも欠けていた場合は `None` を返す。
     pub fn interpolate(&self, p: LatLon) -> Option<LatLon> {
-        // 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する (飛田, 2002)
+        // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する (飛田, 2002)
         let mesh = Mesh3::floor(p);
         let i = self.search_after(0, mesh)?;
         let sw_shift = self.dots[i].shift;
@@ -133,7 +133,7 @@ mod tests {
 
     #[cfg(feature = "tky2jgd")]
     #[test]
-    fn grid_tky2jgd() {
+    fn tky2jgd() {
         let records = TKY2JGD.dots;
         assert_eq!(records.len(), 392323);
 
@@ -147,9 +147,9 @@ mod tests {
     const MILLI_METER_IN_DEGREES: f64 = 0.000000009;
 
     //         45"
-    //  (0, 0) -- (6, 6)    2    1
+    //  (0, 0) -- (6, 6)
     //    |         | 30"
-    //  (0,-6) -- (6, 0)    4    2
+    //  (0,-6) -- (6, 0)
     const SMALLEST: &[Dot] = &[
         Dot {
             mesh: Mesh3 { lon: 0, lat: 0 },
@@ -170,7 +170,7 @@ mod tests {
     ];
 
     #[test]
-    fn grid_interpolate_corner() {
+    fn interpolate_corner() {
         let sut = Grid::new(&SMALLEST);
         let ret = sut.interpolate(LatLon(0.0, 0.0)).unwrap();
         assert_eq!(ret.lon(), 0.0);
@@ -178,7 +178,7 @@ mod tests {
     }
 
     #[test]
-    fn grid_interpolate_middle() {
+    fn interpolate_middle() {
         let sut = Grid::new(&SMALLEST);
         let exp = LatLon::from_micro_secs(-2, 2);
         let ret = sut.interpolate(LatLon::from_secs(10., 15.)).unwrap();

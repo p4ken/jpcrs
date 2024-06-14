@@ -21,18 +21,24 @@ use std::ops::{Add, Mul, Sub};
 //     impl Sealed for super::LonLat {}
 // }
 
-/// 度単位の緯度経度。
-/// Latitude and longitude in degrees.
+/// 緯度経度。
+/// Latitude and longitude.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct LatLon(pub f64, pub f64);
 impl LatLon {
+    /// 秒から度に変換する。
+    /// Converts seconds to degrees.
     pub fn from_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
         let [lat, lon] = [lat, lon].map(|x| x.into() / 3_600.);
         Self(lat, lon)
     }
+    /// ミリ秒から度に変換する。
+    /// Converts milliseconds to degrees.
     pub fn from_milli_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
         Self::from_secs(lat, lon) * 0.001
     }
+    /// マイクロ秒から度に変換する。
+    /// Converts microseconds to degrees.
     pub fn from_micro_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
         Self::from_milli_secs(lat, lon) * 0.001
     }
