@@ -3,8 +3,24 @@ use crate::LatLon;
 #[cfg(feature = "tky2jgd")]
 use crate::TKY2JGD;
 
+#[cfg(feature = "patchjgd")]
+use crate::TOUHOKUTAIHEIYOUOKI2011;
+
 pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
     Tokyo::new(LatLon(lat, lon))
+}
+
+pub fn from_tokyo97(lat: f64, lon: f64) -> Tokyo97 {
+    // Tokyo97::new(LatLon(lat, lon))
+    todo!()
+}
+
+pub fn from_jgd2000(lat: f64, lon: f64) -> Jgd2000 {
+    Jgd2000::new(LatLon(lat, lon))
+}
+
+pub fn from_jgd2011(lat: f64, lon: f64) -> Jgd2000 {
+    Jgd2000::new(LatLon(lat, lon))
 }
 
 // pub fn from_tokyo_(p: impl Into<LatLon>) -> Tokyo {
@@ -12,7 +28,7 @@ pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
 // }
 
 /// 旧日本測地系。
-/// Tokyo Datum, the older Japanese Datum.
+/// Tokyo Datum, The older Japanese Datum.
 ///
 /// EPSG: 4301
 pub struct Tokyo {
@@ -35,52 +51,52 @@ impl Tokyo {
     //     Self { lat: y, lon: x }
     // }
 
-    /// [`TKY2JGD`] を用いて [`JGD2000`] へ変換する。
+    /// [`TKY2JGD`] を用いて [`Jgd2000`] へ変換する。
+    /// Transform to JGD2000.
     ///
-    /// パラメータグリッドの範囲外の場合は、3パラメータにフォールバックする。
+    /// # Limitations
+    ///
+    /// 日本国内の地表面の座標のみに使用できる。地中や空中ではズレが大きくなる。
+    ///
+    /// パラメータグリッドの範囲外の座標は、[`Tokyo97`] を経由し、一律の数式による変換にフォールバックされる。
+    /// たとえ陸地であっても、無人島や、後年に埋め立てられた沿岸部などで、パラメータグリッドが欠損している。
+    /// 複数の座標で表される形状が、パラメータグリッドの範囲内外をまたがっていると、変換後の形状が大きく変わる可能性がある。
+    ///
+    /// 国土地理院によるオリジナルの実装の精度は、一定条件下で「緯度, 経度の標準偏差はそれぞれ9cm, 8cm」[(飛田, 2002)](crate#references) とされている。
     #[cfg(feature = "tky2jgd")]
     pub fn to_jgd2000(&self) -> Jgd2000 {
-        // 国土地理院時報(2002，97集)「世界測地系移行のための座標変換ソフトウェア”TKY2JGD"」
-        // https://www.gsi.go.jp/common/000063173.pdf
-        // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する。
         match TKY2JGD.interpolate(self.lat_lon) {
             Some(shift) => Jgd2000::new(self.lat_lon + shift),
             None => self.to_tokyo97().to_jgd2000(),
         }
     }
 
-    /// 離島位置の補正量を用いて [`Tokyo97`] へ変換する
+    /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo97`] へ変換する。
     pub fn to_tokyo97(&self) -> Tokyo97 {
-        // 日本測地系における離島位置の補正量
-        // https://www.jstage.jst.go.jp/article/sokuchi1954/49/3/49_3_181/_pdf
+        // https://www.drm.jp/jisx0410/JisGridSystem_1_Geoid.html
         todo!()
     }
 }
 
-/// Tokyo97 座標系。
-/// Tokyo97, the older Japanese Datum.
+/// 旧日本測地系。
+/// Tokyo 97, The older Japanese Datum.
 ///
-/// 3パラメータを用いた変換式で定義される[^1]旧日本測地系。
-///
-/// [^1]: 飛田幹男 [最近の測地座標系と座標変換についての考察](https://www.jstage.jst.go.jp/article/sokuchi1954/43/4/43_4_231/_pdf) (測地学会誌 43巻 4号 (1997) pp231-235)
+/// 世界測地系を基準に、3パラメータによる変換式で定義された測地系 [(飛田, 1997)](crate#references)。
 pub struct Tokyo97 {
     lat_lon: LatLon,
 }
 impl Tokyo97 {
-    /// 3パラメータを用いて [`JGD2000`] へ変換する
+    /// 3パラメータによる変換式 [(飛田, 1997)](crate#references) を用いて [`Jgd2000`] へ変換する。
     pub fn to_jgd2000(&self) -> Jgd2000 {
         todo!()
     }
 
-    /// 離島位置の補正量を用いて [`TokyoDatum`] へ逆変換する
-    pub fn to_tokyo(&self) {
-        // 日本測地系における離島位置の補正量
-        // https://www.jstage.jst.go.jp/article/sokuchi1954/49/3/49_3_181/_pdf
-    }
+    /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo`] へ逆変換する。
+    pub fn to_tokyo(&self) {}
 }
 
-/// 世界測地系。
-/// JGD2000, Japanese Geodetic Datum 2000.
+/// 世界測地系 JGD2000.
+/// Japanese Geodetic Datum 2000.
 ///
 /// EPSG: 4612
 pub struct Jgd2000 {
@@ -90,32 +106,32 @@ pub struct Jgd2000 {
 impl Jgd2000 {
     // GRS80楕円体
 
-    pub fn new(degree: impl Into<LatLon>) -> Self {
+    fn new(degree: impl Into<LatLon>) -> Self {
         let lat_lon = degree.into();
         Self { lat_lon }
     }
 
-    /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2011`] へ変換する
+    /// [`TOUHOKUTAIHEIYOUOKI2011`] を用いて [`Jgd2011`] へ変換する。
+    ///
+    /// パラメータグリッド内の一部地域に欠損があり、
     pub fn to_jgd2011(&self) -> Jgd2011 {
-        // 地震時地殻変動に伴う座標値の変化を補正するソフトウェア“PatchJGD”
-        // https://www.jstage.jst.go.jp/article/sokuchi/55/4/55_4_355/_pdf/-char/ja
         todo!()
     }
 
-    /// `tky2jgd.par` を用いて [`TokyoDatum`] へ逆変換する
+    /// [`TKY2JGD`] を用いて [`Tokyo`] へ逆変換する。
+    /// Inverse of [`Tokyo::to_jgd2000`].
+    ///
+    /// 今後、あらゆるデータが世界測地系で測量、作成されるため、なるべく本メソッドは使わない方が良い。
+    /// 新旧の測地系の座標を重ねる用途であれば、原則として旧日本測地系から世界測地系へ変換した方が良い。
     pub fn to_tokyo(&self) {}
 
-    /// 3パラメータを用いて [`Tokyo97`] へ逆変換する
-    pub fn to_tokyo97(&self) {
-        // https://www.drm.jp/jisx0410/JisGridSystem_1_Geoid.html
-
-        // https://www.jstage.jst.go.jp/article/sokuchi1954/43/4/43_4_231/_pdf
-        // > このパラメータによって定義される日本測地系がTokyo97である
-    }
+    /// 3パラメータを用いて [`Tokyo97`] へ逆変換する。
+    /// Inverse of [`Tokyo97::to_jgd2000`].
+    pub fn to_tokyo97(&self) {}
 }
 
-/// 世界測地系。
-/// JGD2011, Japanese Geodetic Datum 2011.
+/// 世界測地系 JGD2011.
+/// Japanese Geodetic Datum 2011.
 ///
 /// EPSG: 6668
 pub struct Jgd2011 {
@@ -130,7 +146,7 @@ impl Jgd2011 {
     //     self.lat_lon.rev()
     // }
 
-    /// `touhokutaiheiyouoki2011.par` を用いて [`JGD2000`] へ逆変換する
+    /// [`TOUHOKUTAIHEIYOUOKI2011`] を用いて [`Jgd2000`] へ逆変換する。
     pub fn to_jgd2000(&self) {}
 }
 
