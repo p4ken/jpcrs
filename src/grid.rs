@@ -108,7 +108,7 @@ impl Mesh3 {
     }
     fn to_degree(self) -> LatLon {
         let lat = f64::from(self.lat) * Self::LAT_SEC / 3_600.;
-        let lon = f64::from(self.lat) * Self::LON_SEC / 3_600.;
+        let lon = f64::from(self.lon) * Self::LON_SEC / 3_600.;
         LatLon(lat, lon)
     }
 }
