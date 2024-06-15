@@ -6,7 +6,7 @@ use crate::TKY2JGD;
 #[cfg(feature = "patchjgd")]
 use crate::TOUHOKUTAIHEIYOUOKI2011;
 
-/// 旧日本測地系からの変換を開始する。
+/// 度単位の旧日本測地系から別の測地系への変換を始める。
 /// Transform from Tokyo Datum.
 ///
 /// 世界測地系で測量された座標の場合は、[`Tokyo97`] ...
@@ -41,24 +41,32 @@ pub fn from_jgd2011(lat: f64, lon: f64) -> Jgd2000 {
 ///
 /// EPSG: 4301
 pub struct Tokyo {
-    lat_lon: LatLon,
+    degree: LatLon,
 }
 impl Tokyo {
     // Bessel楕円体
 
-    fn new(lat_lon: impl Into<LatLon>) -> Self {
-        let lat_lon = lat_lon.into();
-        Self { lat_lon }
+    /// 度単位の旧日本測地系から別の測地系への変換を始める。
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use jgd::{LatLon, Tokyo};
+    ///
+    /// let degree = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
+    /// let tokyo = Tokyo::new(degree);
+    /// ```
+    ///
+    /// <br>
+    ///
+    /// すでに度単位の座標が分かっている場合は [`from_tokyo`] の方が簡単に使える。
+    ///
+    /// ```
+    /// let tokyo = jgd::from_tokyo(35.0, 135.0);
+    /// ```
+    pub fn new(degree: LatLon) -> Self {
+        Self { degree }
     }
-
-    // pub fn with_lon_lat(degree: impl Into<LonLat>) -> Self {
-    //     Self::new(degree.into())
-    // }
-
-    // pub fn with_xy(xy: impl Into<XY>) -> Self {
-    //     let XY(x, y) = xy.into();
-    //     Self { lat: y, lon: x }
-    // }
 
     /// [`TKY2JGD`] を用いて [`Jgd2000`] へ変換する。
     /// Transform to JGD2000.
@@ -74,8 +82,8 @@ impl Tokyo {
     /// 国土地理院によるオリジナルの実装の精度は、一定条件下で「緯度, 経度の標準偏差はそれぞれ9cm, 8cm」[(飛田, 2002)](crate#references) とされている。
     #[cfg(feature = "tky2jgd")]
     pub fn to_jgd2000(&self) -> Jgd2000 {
-        match TKY2JGD.interpolate(self.lat_lon) {
-            Some(shift) => Jgd2000::new(self.lat_lon + shift),
+        match TKY2JGD.interpolate(self.degree) {
+            Some(shift) => Jgd2000::new(self.degree + shift),
             None => self.to_tokyo97().to_jgd2000(),
         }
     }
@@ -142,6 +150,11 @@ impl Jgd2000 {
     /// 3パラメータを用いて [`Tokyo97`] へ逆変換する。
     /// Inverse of [`Tokyo97::to_jgd2000`].
     pub fn to_tokyo97(&self) {}
+
+    /// ...
+    pub fn inner(&self) -> LatLon {
+        self.lat_lon
+    }
 }
 
 /// 世界測地系。Japanese Geodetic Datum 2011 (JGD2011).

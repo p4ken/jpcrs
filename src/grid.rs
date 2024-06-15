@@ -129,6 +129,8 @@ impl MicroSecond {
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_ulps_eq;
+
     use super::*;
 
     #[cfg(feature = "tky2jgd")]
@@ -143,8 +145,6 @@ mod tests {
         assert_eq!(r.shift.lat, 7875320);
         assert_eq!(r.shift.lon, -13995610);
     }
-
-    const MILLI_METER_IN_DEGREES: f64 = 0.000000009;
 
     //         45"
     //  (0, 0) -- (6, 6)
@@ -182,8 +182,7 @@ mod tests {
         let sut = Grid::new(&SMALLEST);
         let exp = LatLon::from_micro_secs(-2, 2);
         let ret = sut.interpolate(LatLon::from_secs(10., 15.)).unwrap();
-        let diff = (ret - exp).abs();
-        assert!(diff.lat() < MILLI_METER_IN_DEGREES);
-        assert!(diff.lon() < MILLI_METER_IN_DEGREES);
+        assert_ulps_eq!(exp.lat(), ret.lat());
+        assert_ulps_eq!(exp.lon(), ret.lon());
     }
 }

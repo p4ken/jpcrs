@@ -40,7 +40,7 @@
 //! 異なる測地系で整備された座標同士のズレを低減できても、ズレが消滅することはない。
 //! 変換メソッド毎に精度や制約が異なり、詳細はそれぞれのドキュメントに記載されている。
 //!
-//! 度単位の緯度経度のみ変換可能。度分秒(DMS)、平面直角座標系(XY)は未対応。
+//! 緯度経度で表される地理座標のみ変換可能。平面直角座標系(XY)は未対応。
 //!
 //! # Features
 //!
@@ -62,7 +62,7 @@ mod grid;
 mod island;
 mod par;
 
-use coord::LatLon;
+pub use coord::{Dms, LatLon};
 pub use crs::{
     from_jgd2000, from_jgd2011, from_tokyo, from_tokyo97, Jgd2000, Jgd2011, Tokyo, Tokyo97,
 };
