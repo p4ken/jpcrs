@@ -43,8 +43,8 @@ impl<'a> Grid<'a> {
         let i = self.search_at(i + 1, mesh.north().east())?;
         let ne_shift = self.dots[i].shift;
 
-        let LatLon(n_weight, e_weight) = mesh.diagonal_weight(p);
-        let LatLon(s_weight, w_weight) = mesh.north().east().diagonal_weight(p);
+        let (n_weight, e_weight) = mesh.diagonal_weight(p).into();
+        let (s_weight, w_weight) = mesh.north().east().diagonal_weight(p).into();
 
         // weighted mean
         let shift = sw_shift.to_degree() * s_weight * w_weight
@@ -96,7 +96,7 @@ impl Mesh3 {
         let min_degree = self.to_degree();
         let weight_lat = (p.lat() - min_degree.lat()).abs() * 3_600. / Self::LAT_SEC;
         let weight_lon = (p.lon() - min_degree.lon()).abs() * 3_600. / Self::LON_SEC;
-        LatLon(weight_lat, weight_lon)
+        LatLon::new(weight_lat, weight_lon)
     }
     fn north(mut self) -> Self {
         self.lat += 1;
@@ -109,7 +109,7 @@ impl Mesh3 {
     fn to_degree(self) -> LatLon {
         let lat = f64::from(self.lat) * Self::LAT_SEC / 3_600.;
         let lon = f64::from(self.lon) * Self::LON_SEC / 3_600.;
-        LatLon(lat, lon)
+        LatLon::new(lat, lon)
     }
 }
 
@@ -123,7 +123,7 @@ impl MicroSecond {
     fn to_degree(self) -> LatLon {
         let lat = f64::from(self.lat) / 3_600_000_000.;
         let lon = f64::from(self.lon) / 3_600_000_000.;
-        LatLon(lat, lon)
+        LatLon::new(lat, lon)
     }
 }
 
@@ -172,7 +172,7 @@ mod tests {
     #[test]
     fn interpolate_corner() {
         let sut = Grid::new(&SMALLEST);
-        let ret = sut.interpolate(LatLon(0.0, 0.0)).unwrap();
+        let ret = sut.interpolate(LatLon::new(0.0, 0.0)).unwrap();
         assert_eq!(ret.lon(), 0.0);
         assert_eq!(ret.lat(), -6. / 3_600_000_000.);
     }

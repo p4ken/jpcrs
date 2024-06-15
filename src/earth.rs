@@ -43,7 +43,7 @@ impl Ellipsoid {
             + self.polar_eccentricity() * self.polar_radius * (theta.sin().powi(3)))
         .atan2(p - self.equatorial_eccentricity() * self.equatorial_radius * (theta.cos().powi(3)));
         let lon = ecef.y().atan2(ecef.x());
-        LatLon(lat.to_degrees(), lon.to_degrees())
+        LatLon::new(lat.to_degrees(), lon.to_degrees())
     }
 
     /// 赤道離心率 = (赤道半径^2 - 極半径^2) / 赤道半径^2

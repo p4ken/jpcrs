@@ -13,7 +13,7 @@
 //! let (lat, lon) = jgd::from_tokyo(35.0, 135.0)
 //!     .to_jgd2000()
 //!     .to_jgd2011()
-//!     .lat_lon();
+//!     .into();
 //! ```
 //!
 //! <br>
@@ -27,7 +27,7 @@
 //! let jgd2011 = tokyo_datum.map_coords(|Coord { x, y }| {
 //!     // 順序に注意: lat, lon <=> y, x
 //! #   #[cfg(all(feature = "tky2jgd", feature = "patchjgd"))]
-//!     let (y, x) = jgd::from_tokyo(y, x).to_jgd2000().to_jgd2011().lat_lon();
+//!     let (y, x) = jgd::from_tokyo(y, x).to_jgd2000().to_jgd2011().into();
 //!     Coord { x, y }
 //! });
 //! ```
@@ -67,7 +67,7 @@ pub use coord::{Dms, LatLon};
 pub use crs::{
     from_jgd2000, from_jgd2011, from_tokyo, from_tokyo97, Jgd2000, Jgd2011, Tokyo, Tokyo97,
 };
-use grid::Grid;
+pub use grid::Grid;
 #[cfg(feature = "tky2jgd")]
 pub use grid::TKY2JGD;
 #[cfg(feature = "patchjgd")]
