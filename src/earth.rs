@@ -53,7 +53,7 @@ impl Ellipsoid {
         (e2 - p2) / e2
     }
 
-    // 極離心率 = (赤道半径^2 - 極半径^2) / 極半径^2
+    /// 極離心率 = (赤道半径^2 - 極半径^2) / 極半径^2
     fn polar_eccentricity(&self) -> f64 {
         let e2 = self.equatorial_radius.powi(2);
         let p2 = self.polar_radius.powi(2);

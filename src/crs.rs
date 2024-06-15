@@ -10,8 +10,8 @@ use crate::TKY2JGD;
 #[cfg(feature = "patchjgd")]
 use crate::TOUHOKUTAIHEIYOUOKI2011;
 
-/// 旧日本測地系からの変換を始める。
-/// Transform from Tokyo Datum.
+/// 旧日本測地系から変換を始める。
+/// Transform from a coordinate in Tokyo Datum.
 ///
 /// 世界測地系で測量された座標の場合は、[`Tokyo97`] ...
 ///
@@ -47,25 +47,24 @@ pub struct Tokyo {
     degrees: LatLon,
 }
 impl Tokyo {
-    // Bessel楕円体
-
-    /// 度単位の旧日本測地系から別の測地系への変換を始める。
+    /// 旧日本測地系から変換を始める。
+    /// Transform from a coordinate in Tokyo Datum.
     ///
     /// # Examples
     ///
     /// ```
     /// use jgd::{LatLon, Tokyo};
     ///
-    /// let degree = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
-    /// let tokyo = Tokyo::new(degree);
+    /// let tokyo = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
+    /// let jgd2000 = Tokyo::new(tokyo).to_jgd2000().degrees();
     /// ```
     ///
     /// <br>
     ///
-    /// すでに度単位の値が分かっている場合は、代わりに [`from_tokyo`] を使える。
+    /// すでに度単位の座標が分かっている場合は、代わりに [`from_tokyo`] を使える。
     ///
     /// ```
-    /// let tokyo = jgd::from_tokyo(35.0, 135.0);
+    /// let jgd2000 = jgd::from_tokyo(35.0, 135.0).to_jgd2000();
     /// ```
     pub fn new(degrees: LatLon) -> Self {
         Self { degrees }
@@ -85,7 +84,7 @@ impl Tokyo {
     /// 国土地理院によるオリジナルの実装の精度は、一定条件下で「緯度, 経度の標準偏差はそれぞれ9cm, 8cm」[(飛田, 2001)](crate#references) とされている。
     #[cfg(feature = "tky2jgd")]
     pub fn to_jgd2000(&self) -> Jgd2000 {
-        match TKY2JGD.interpolate(self.degrees) {
+        match TKY2JGD.bilinear(self.degrees) {
             Some(shift) => Jgd2000::new(self.degrees + shift),
             None => self.to_tokyo97().to_jgd2000(),
         }
@@ -124,7 +123,7 @@ impl Tokyo97 {
 
     /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo`] へ逆変換する。
     /// Inverse of [`Tokyo::to_tokyo97`].
-    pub fn to_tokyo(&self) {}
+    fn to_tokyo(&self) {}
 }
 
 /// 世界測地系。Japanese Geodetic Datum 2000 (JGD2000).
@@ -147,7 +146,7 @@ impl Jgd2000 {
     /// ただし、今後のバージョンアップで他のいくつかの地殻変動分を追加する可能性がある。
     /// いずれにしても ...
     pub fn to_jgd2011(&self) -> Jgd2011 {
-        // todo
+        // TODO
         Jgd2011::new(self.degrees)
     }
 
@@ -160,7 +159,7 @@ impl Jgd2000 {
 
     /// 3パラメータを用いて [`Tokyo97`] へ逆変換する。
     /// Inverse of [`Tokyo97::to_jgd2000`].
-    pub fn to_tokyo97(&self) {}
+    fn to_tokyo97(&self) {}
 
     /// ...
     pub fn degrees(&self) -> LatLon {

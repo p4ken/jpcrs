@@ -6,7 +6,7 @@
 //!
 //! # Examples
 //!
-//! 旧日本測地系 [`Tokyo`] の北緯35度・東経135度を、世界測地系 [`Jgd2011`] に変換する例。
+//! 旧日本測地系 [`Tokyo`] の北緯35度 東経135度を、世界測地系 [`Jgd2011`] に変換する。
 //!
 //! ```
 //! # #[cfg(all(feature = "tky2jgd", feature = "patchjgd"))]
@@ -18,7 +18,7 @@
 //!
 //! <br>
 //!
-//! [`geo`](https://docs.rs/geo/latest/geo/index.html#types) クレートの測地系を変換する例。
+//! [`geo`](https://docs.rs/geo/latest/geo/index.html#types) の形状を測地系変換する。
 //!
 //! ```
 //! use geo::{Coord, LineString, MapCoords};

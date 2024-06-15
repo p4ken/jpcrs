@@ -19,7 +19,7 @@ pub struct Grid<'a> {
     dots: &'a [Dot],
 }
 impl<'a> Grid<'a> {
-    pub const fn new(dots: &'a [Dot]) -> Self {
+    pub(crate) const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
 
@@ -28,7 +28,7 @@ impl<'a> Grid<'a> {
     ///
     /// 指定された座標が属する3次メッシュの四隅すべてのパラメータがグリッド内に存在しなければならない。
     /// 一つでも欠けていた場合は `None` を返す。
-    pub fn interpolate(&self, p: LatLon) -> Option<LatLon> {
+    pub fn bilinear(&self, p: LatLon) -> Option<LatLon> {
         // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する (飛田, 2001)
         let mesh = Mesh3::floor(p);
         let i = self.search_after(0, mesh)?;
@@ -54,6 +54,7 @@ impl<'a> Grid<'a> {
 
         Some(shift)
     }
+
     fn search_after(&self, first: usize, query: Mesh3) -> Option<usize> {
         self.dots
             .get(first..)?
@@ -61,8 +62,15 @@ impl<'a> Grid<'a> {
             .ok()
             .map(|i| i + first)
     }
+
     fn search_at(&self, index: usize, query: Mesh3) -> Option<usize> {
         (self.dots.get(index)?.mesh == query).then_some(index)
+    }
+
+    /// 最近傍補間。
+    /// Nearest-neighbor interpolation.
+    fn nearest(&self, degrees: LatLon, limit: f64) -> LatLon {
+        todo!()
     }
 }
 
@@ -172,7 +180,7 @@ mod tests {
     #[test]
     fn interpolate_corner() {
         let sut = Grid::new(&SMALLEST);
-        let ret = sut.interpolate(LatLon::new(0.0, 0.0)).unwrap();
+        let ret = sut.bilinear(LatLon::new(0.0, 0.0)).unwrap();
         assert_eq!(ret.lon(), 0.0);
         assert_eq!(ret.lat(), -6. / 3_600_000_000.);
     }
@@ -181,7 +189,7 @@ mod tests {
     fn interpolate_middle() {
         let sut = Grid::new(&SMALLEST);
         let exp = LatLon::from_micro_secs(-2, 2);
-        let ret = sut.interpolate(LatLon::from_secs(10., 15.)).unwrap();
+        let ret = sut.bilinear(LatLon::from_secs(10., 15.)).unwrap();
         assert_ulps_eq!(exp.lat(), ret.lat());
         assert_ulps_eq!(exp.lon(), ret.lon());
     }
