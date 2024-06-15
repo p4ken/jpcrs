@@ -1,11 +1,11 @@
 use jgd::LatLon;
 
-// #[test]
-// fn from_d() {
-//     let sut = LatLon::new(1.0, 2.0);
-//     assert_eq!(sut.lat(), 1.0);
-//     assert_eq!(sut.lon(), 2.0)
-// }
+#[test]
+fn from_d() {
+    let sut = LatLon::new(1.0, 2.0);
+    assert_eq!(sut.lat(), 1.0);
+    assert_eq!(sut.lon(), 2.0)
+}
 
 #[test]
 fn from_s() {

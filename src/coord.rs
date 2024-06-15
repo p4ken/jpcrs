@@ -9,7 +9,7 @@ pub struct LatLon {
 }
 impl LatLon {
     /// Constructs with latitude and longitude.
-    pub(crate) fn new(lat: f64, lon: f64) -> Self {
+    pub fn new(lat: f64, lon: f64) -> Self {
         Self { lat, lon }
     }
 

@@ -1,9 +1,6 @@
-name: Rust
+name: Publish new version
 
 on:
-  push:
-  schedule:
-    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       bump:
@@ -17,13 +14,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: make test
-
   publish:
     if: "${{ inputs.bump }}"
     needs: build
