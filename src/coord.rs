@@ -1,26 +1,5 @@
 use std::ops::{Add, Mul, Sub};
 
-/// 測地座標。
-/// Geodetic coordinate.
-// pub trait Geodetic: Sized {
-//     fn with_lat_lon(lat_lon: (f64, f64)) -> Self;
-//     fn lat_lon(&self) -> (f64, f64);
-//     fn with_lon_lat(lon_lat: (f64, f64)) -> Self {
-//         let (lon, lat) = lon_lat;
-//         Self::with_lat_lon((lat, lon))
-//     }
-//     fn lon_lat(&self) -> (f64, f64) {
-//         let (lat, lon) = self.lat_lon();
-//         (lon, lat)
-//     }
-// }
-
-// mod seal {
-//     pub trait Sealed {}
-//     impl Sealed for super::LatLon {}
-//     impl Sealed for super::LonLat {}
-// }
-
 /// 度単位の緯度経度。
 /// Latitude and longitude in degrees.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
@@ -60,6 +39,7 @@ impl LatLon {
     pub fn from_micro_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
         Self::from_milli_secs(lat, lon) * 0.001
     }
+
     // pub fn new(lat_lon: impl Into<(f64, f64)>) -> Self {
     //     let (lat, lon) = lat_lon.into();
     //     Self(lat, lon)
@@ -68,18 +48,22 @@ impl LatLon {
     //     let (lon, lat) = lon_lat.into();
     //     Self(lat, lon)
     // }
+
     pub fn lat(&self) -> f64 {
         self.0
     }
+
     pub fn lon(&self) -> f64 {
         self.1
     }
+
     // pub fn rev(&self) -> (f64, f64) {
     //     (self.lon(), self.lat())
     // }
     pub fn abs(self) -> Self {
         self.map(f64::abs)
     }
+
     pub fn map(mut self, f: fn(f64) -> f64) -> Self {
         self.0 = f(self.0);
         self.1 = f(self.1);
@@ -133,7 +117,48 @@ impl<D: Into<i32>, M: Into<i32>, S: Into<f64>> From<(D, M, S)> for Dms {
     }
 }
 
-pub struct ECEF {}
+/// 三次元直交座標。
+#[derive(Debug, Clone, Copy)]
+pub struct ECEF {
+    x: f64,
+    y: f64,
+    z: f64,
+}
 impl ECEF {
-    pub fn to_geodetic() {}
+    /// コンストラクタ。
+    pub const fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
+
+    pub fn x(&self) -> f64 {
+        self.x
+    }
+
+    pub fn y(&self) -> f64 {
+        self.y
+    }
+
+    pub fn z(&self) -> f64 {
+        self.z
+    }
+}
+impl Add for ECEF {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        }
+    }
+}
+impl Sub for ECEF {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
+    }
 }

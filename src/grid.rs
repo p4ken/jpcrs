@@ -29,7 +29,7 @@ impl<'a> Grid<'a> {
     /// 指定された座標が属する3次メッシュの四隅すべてのパラメータがグリッド内に存在しなければならない。
     /// 一つでも欠けていた場合は `None` を返す。
     pub fn interpolate(&self, p: LatLon) -> Option<LatLon> {
-        // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する (飛田, 2002)
+        // > 地域毎の変換パラメータの格子点は，3 次メッシュの中央ではなく，南西隅に対応する (飛田, 2001)
         let mesh = Mesh3::floor(p);
         let i = self.search_after(0, mesh)?;
         let sw_shift = self.dots[i].shift;

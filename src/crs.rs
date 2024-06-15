@@ -1,4 +1,8 @@
-use crate::LatLon;
+use crate::{
+    coord::ECEF,
+    earth::{BESSEL, GRS80},
+    LatLon,
+};
 
 #[cfg(feature = "tky2jgd")]
 use crate::TKY2JGD;
@@ -79,7 +83,7 @@ impl Tokyo {
     /// たとえ陸地であっても、無人島や、後年に埋め立てられた沿岸部などで、パラメータグリッドが欠損している。
     /// 複数の座標で表される形状が、パラメータグリッドの範囲内外をまたがっていると、変換後の形状が大きく変わる可能性がある。
     ///
-    /// 国土地理院によるオリジナルの実装の精度は、一定条件下で「緯度, 経度の標準偏差はそれぞれ9cm, 8cm」[(飛田, 2002)](crate#references) とされている。
+    /// 国土地理院によるオリジナルの実装の精度は、一定条件下で「緯度, 経度の標準偏差はそれぞれ9cm, 8cm」[(飛田, 2001)](crate#references) とされている。
     #[cfg(feature = "tky2jgd")]
     pub fn to_jgd2000(&self) -> Jgd2000 {
         match TKY2JGD.interpolate(self.degree) {
@@ -90,8 +94,8 @@ impl Tokyo {
 
     /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo97`] へ変換する。
     pub fn to_tokyo97(&self) -> Tokyo97 {
-        // https://www.drm.jp/jisx0410/JisGridSystem_1_Geoid.html
-        todo!()
+        // TODO
+        Tokyo97::new(self.degree)
     }
 }
 
@@ -99,13 +103,24 @@ impl Tokyo {
 ///
 /// 世界測地系を基準に、3パラメータによる変換式で定義された測地系 [(飛田, 1997)](crate#references)。
 pub struct Tokyo97 {
-    lat_lon: LatLon,
+    degree: LatLon,
 }
 impl Tokyo97 {
-    /// 3パラメータによる変換式 [(飛田, 1997)](crate#references) を用いて [`Jgd2000`] へ変換する。
+    /// ITRF94系へ変換する3パラメータ [(飛田, 2001)](crate#references)。
+    const TO_ITRF94: ECEF = ECEF::new(-146.414, 507.337, 680.507);
+
+    /// ...
+    pub fn new(degree: LatLon) -> Self {
+        Self { degree }
+    }
+
+    /// 3パラメータ [(飛田, 2001)](crate#references) を用いて [`Jgd2000`] へ変換する。
     /// Transform to JGD2000.
     pub fn to_jgd2000(&self) -> Jgd2000 {
-        todo!()
+        // https://www.gsi.go.jp/LAW/G2000-g2000faq-1.htm
+        // > 測地成果2000での経度・緯度は、世界測地系であるITRF94座標系とGRS80の楕円体を使用して表します
+        let itrf94 = BESSEL.to_ecef(self.degree) + Self::TO_ITRF94;
+        Jgd2000::new(GRS80.to_geodetic(itrf94))
     }
 
     /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo`] へ逆変換する。
@@ -117,15 +132,12 @@ impl Tokyo97 {
 ///
 /// EPSG: 4612
 pub struct Jgd2000 {
-    lat_lon: LatLon,
+    degree: LatLon,
 }
-
 impl Jgd2000 {
-    // GRS80楕円体
-
-    fn new(lat_lon: impl Into<LatLon>) -> Self {
-        let lat_lon = lat_lon.into();
-        Self { lat_lon }
+    /// ...
+    fn new(degree: LatLon) -> Self {
+        Self { degree }
     }
 
     /// [`TOUHOKUTAIHEIYOUOKI2011`] を用いて [`Jgd2011`] へ変換する。
@@ -137,15 +149,15 @@ impl Jgd2000 {
     /// いずれにしても ...
     pub fn to_jgd2011(&self) -> Jgd2011 {
         // todo
-        Jgd2011::new(self.lat_lon)
+        Jgd2011::new(self.degree)
     }
 
-    /// [`TKY2JGD`] を用いて [`Tokyo`] へ逆変換する。
-    /// Inverse of [`Tokyo::to_jgd2000`].
-    ///
-    /// 今後、あらゆるデータが世界測地系で測量、作成されるため、なるべく本メソッドは使わない方が良い。
-    /// 新旧の測地系の座標を重ねる用途であれば、原則として旧日本測地系から世界測地系へ変換した方が良い。
-    pub fn to_tokyo(&self) {}
+    // /// [`TKY2JGD`] を用いて [`Tokyo`] へ逆変換する。
+    // /// Inverse of [`Tokyo::to_jgd2000`].
+    // ///
+    // /// 今後、あらゆるデータが世界測地系で測量、作成されるため、なるべく本メソッドは使わない方が良い。
+    // /// 新旧の測地系の座標を重ねる用途であれば、原則として旧日本測地系から世界測地系へ変換した方が良い。
+    // pub fn to_tokyo(&self) {}
 
     /// 3パラメータを用いて [`Tokyo97`] へ逆変換する。
     /// Inverse of [`Tokyo97::to_jgd2000`].
@@ -153,7 +165,7 @@ impl Jgd2000 {
 
     /// ...
     pub fn inner(&self) -> LatLon {
-        self.lat_lon
+        self.degree
     }
 }
 
@@ -161,18 +173,18 @@ impl Jgd2000 {
 ///
 /// EPSG: 6668
 pub struct Jgd2011 {
-    lat_lon: LatLon,
+    degree: LatLon,
 }
 impl Jgd2011 {
-    fn new(lat_lon: impl Into<LatLon>) -> Self {
-        let lat_lon = lat_lon.into();
-        Self { lat_lon }
+    /// ...
+    fn new(degree: LatLon) -> Self {
+        Self { degree }
     }
 
     /// 度単位の緯度経度。
     /// Latitude and longitude in degrees.
     pub fn lat_lon(&self) -> (f64, f64) {
-        self.lat_lon.into()
+        self.degree.into()
     }
 
     // pub fn lon_lat(&self) -> (f64, f64) {
