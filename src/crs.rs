@@ -104,11 +104,10 @@ pub struct Tokyo97 {
     degrees: LatLon,
 }
 impl Tokyo97 {
-    /// ITRF94系へ変換する3パラメータ [(飛田, 2001)](crate#references)。
     const TO_ITRF94: ECEF = ECEF::new(-146.414, 507.337, 680.507);
 
     /// ...
-    pub fn new(degrees: LatLon) -> Self {
+    fn new(degrees: LatLon) -> Self {
         Self { degrees }
     }
 
@@ -123,7 +122,7 @@ impl Tokyo97 {
 
     /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo`] へ逆変換する。
     /// Inverse of [`Tokyo::to_tokyo97`].
-    fn to_tokyo(&self) {}
+    fn _to_tokyo(&self) {}
 }
 
 /// 世界測地系。Japanese Geodetic Datum 2000 (JGD2000).
@@ -159,7 +158,7 @@ impl Jgd2000 {
 
     /// 3パラメータを用いて [`Tokyo97`] へ逆変換する。
     /// Inverse of [`Tokyo97::to_jgd2000`].
-    fn to_tokyo97(&self) {}
+    fn _to_tokyo97(&self) {}
 
     /// ...
     pub fn degrees(&self) -> LatLon {

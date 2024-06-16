@@ -27,3 +27,10 @@ fn from_us() {
     assert_eq!(sut.lat(), 1.0);
     assert_eq!(sut.lon(), 2.0)
 }
+
+#[test]
+fn from_dms() {
+    let sut = LatLon::from_dms((1, 6, 36), (2, 30, 0));
+    assert_eq!(sut.lat(), 1.11);
+    assert_eq!(sut.lon(), 2.50)
+}

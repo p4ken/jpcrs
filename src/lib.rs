@@ -2,7 +2,7 @@
 #![cfg_attr(all(doc, not(doctest)), feature(doc_auto_cfg))]
 
 //! 日本国内の測地系を変換する。
-//! Transform datums used in Japan.
+//! Transform geodetic datums used in Japan.
 //!
 //! # Examples
 //!

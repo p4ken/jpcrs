@@ -22,10 +22,9 @@ pub struct Ellipsoid {
     polar_radius: f64,
 }
 impl Ellipsoid {
-    /// 測地座標から変換する
+    /// 三次元直交座標に変換する。
     pub fn to_ecef(&self, degree: LatLon) -> ECEF {
-        let lat = degree.lat().to_radians();
-        let lon = degree.lon().to_radians();
+        let (lat, lon) = degree.map(f64::to_radians).into();
         let geoid = self.equatorial_radius
             / (1.0 - self.equatorial_eccentricity() * lat.sin().powi(2)).sqrt();
         ECEF::new(
@@ -35,7 +34,7 @@ impl Ellipsoid {
         )
     }
 
-    /// 測地座標に変換する
+    /// 測地座標に変換する。
     pub fn to_geodetic(&self, ecef: ECEF) -> LatLon {
         let p = ecef.x().hypot(ecef.y());
         let theta = ((ecef.z() * self.equatorial_radius) / (p * self.polar_radius)).atan();

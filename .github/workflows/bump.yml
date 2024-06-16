@@ -1,0 +1,29 @@
+name: Bump version
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        type: choice
+        options:
+          - beta
+          - patch
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install cargo set-version
+      run: cargo install cargo-edit
+    - name: Bump
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "<>"
+        cargo set-version --package jgd --bump ${{ inputs.bump }}
+        git commit --all -m "v${{ inputs.bump }}"
+        git tag "v${{ inputs.bump }}"
+        git push --tags

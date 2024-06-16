@@ -2,11 +2,11 @@
 name = "jgd"
 version = "0.1.0"
 edition = "2021"
-description = "Transform geodetic coordinates used in Japan"
+description = "Transform geodetic datums used in Japan"
 keywords = ["TKY2JGD", "PatchJGD", "JGD2000", "JGD2011"]
-
-# minimum in edition 2021
-rust-version = "1.56"
+license = "MIT"
+documentation = "https://docs.rs/jgd"
+repository = "https://github.com/p4ken/jgd"
 
 [workspace]
 members = ["par/conv"]

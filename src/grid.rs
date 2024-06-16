@@ -69,7 +69,7 @@ impl<'a> Grid<'a> {
 
     /// 最近傍補間。
     /// Nearest-neighbor interpolation.
-    fn nearest(&self, degrees: LatLon, limit: f64) -> LatLon {
+    fn _nearest(&self, _degrees: LatLon, _limit: f64) -> LatLon {
         todo!()
     }
 }
@@ -115,9 +115,9 @@ impl Mesh3 {
         self
     }
     fn to_degree(self) -> LatLon {
-        let lat = f64::from(self.lat) * Self::LAT_SEC / 3_600.;
-        let lon = f64::from(self.lon) * Self::LON_SEC / 3_600.;
-        LatLon::new(lat, lon)
+        let lat = f64::from(self.lat) * Self::LAT_SEC;
+        let lon = f64::from(self.lon) * Self::LON_SEC;
+        LatLon::from_secs(lat, lon)
     }
 }
 

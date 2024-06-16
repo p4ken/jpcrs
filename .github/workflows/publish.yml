@@ -1,35 +1,20 @@
-name: Publish new version
+name: CD
 
 on:
-  workflow_dispatch:
-    inputs:
-      bump:
-        type: choice
-        options:
-          - ''
-          - patch
-          - minor
+  push:
+    tags:
+      - v*.*.*
+    branches:
+      - main
 
 env:
   CARGO_TERM_COLOR: always
+  CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
 jobs:
   publish:
-    if: "${{ inputs.bump }}"
-    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install cargo set-version
-      run: cargo install cargo-edit
-    - name: Bump
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "<>"
-        cargo set-version --package jgd --bump ${{ inputs.bump }}
-        git commit --all -m "v${{ inputs.bump }}"
-        git tag "v${{ inputs.bump }}"
     - name: Publish
-      env:
-        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
       run: cargo publish --dry-run

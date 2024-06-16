@@ -9,7 +9,8 @@ pub struct LatLon {
 }
 impl LatLon {
     /// Constructs with latitude and longitude.
-    pub fn new(lat: f64, lon: f64) -> Self {
+    pub fn new<T: Into<f64>>(lat: T, lon: T) -> Self {
+        let (lat, lon) = (lat.into(), lon.into());
         Self { lat, lon }
     }
 
@@ -64,11 +65,7 @@ impl LatLon {
         self.lon
     }
 
-    pub fn abs(self) -> Self {
-        self.map(f64::abs)
-    }
-
-    fn map(mut self, f: impl Fn(f64) -> f64) -> Self {
+    pub(crate) fn map(mut self, f: impl Fn(f64) -> f64) -> Self {
         self.lat = f(self.lat);
         self.lon = f(self.lon);
         self
@@ -110,28 +107,24 @@ impl From<LatLon> for (f64, f64) {
 
 /// 度分秒。
 /// Degrees, minutes, seconds.
-///
-/// # Examples
-///
-/// ```
-/// use jgd::Dms;
-///
-/// let akashi = Dms(135, 0, 0.0);
-/// ```
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct Dms(pub i32, pub i32, pub f64);
+pub struct Dms(i32, i32, f64);
 impl Dms {
+    fn new<D: Into<i32>, M: Into<i32>, S: Into<f64>>(d: D, m: M, s: S) -> Self {
+        Self(d.into(), m.into(), s.into())
+    }
     fn to_degrees(&self) -> f64 {
         f64::from(self.0) + f64::from(self.1) / 60. + self.2 / 3_600.
     }
 }
 impl<D: Into<i32>, M: Into<i32>, S: Into<f64>> From<(D, M, S)> for Dms {
     fn from((d, m, s): (D, M, S)) -> Self {
-        Self(d.into(), m.into(), s.into())
+        Self::new(d, m, s)
     }
 }
 
 /// 三次元直交座標。
+/// Earth-centered, Earth-fixed coordinate.
 #[derive(Debug, Clone, Copy)]
 pub struct ECEF {
     x: f64,
@@ -139,7 +132,6 @@ pub struct ECEF {
     z: f64,
 }
 impl ECEF {
-    /// コンストラクタ。
     pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }

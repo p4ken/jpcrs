@@ -1,16 +1,20 @@
-.PHONY: all
+.PHONY: all test test-d test-d-min test-r package doc
+
 all: test package doc
 
-.PHONY: test
-test:
-	cargo test --all-features
+test: test-d test-d-min test-r
+
+test-d:
+	cargo test
+
+test-d-min:
 	cargo test --no-default-features --all-targets  # without doc
+
+test-r:
 	cargo test --release
 
-.PHONY: package
 package:
 	cargo package --allow-dirty
 
-.PHONY: doc
 doc:
-	cargo +nightly doc --no-deps --all-features
+	cargo +nightly doc --no-deps
