@@ -2,7 +2,7 @@ use std::ops::{Add, Div, Mul, Sub};
 
 /// 緯度経度。
 /// Latitude and longitude of a coordinate.
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
 pub struct LatLon {
     lat: f64,
     lon: f64,

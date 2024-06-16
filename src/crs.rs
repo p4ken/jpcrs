@@ -144,9 +144,12 @@ impl Jgd2000 {
     /// 現在のところ、東日本大震災による地殻変動分しか補正されない。
     /// ただし、今後のバージョンアップで他のいくつかの地殻変動分を追加する可能性がある。
     /// いずれにしても ...
+    #[cfg(feature = "patchjgd")]
     pub fn to_jgd2011(&self) -> Jgd2011 {
-        // TODO
-        Jgd2011::new(self.degrees)
+        let shift = TOUHOKUTAIHEIYOUOKI2011
+            .bilinear(self.degrees)
+            .unwrap_or_default();
+        Jgd2011::new(self.degrees + shift)
     }
 
     // /// [`TKY2JGD`] を用いて [`Tokyo`] へ逆変換する。
