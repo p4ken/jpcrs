@@ -24,6 +24,6 @@ jobs:
         git config user.name "GitHub Actions"
         git config user.email "<>"
         cargo set-version --package jgd --bump ${{ inputs.bump }}
-        git commit --all -m "v__FIXME__"
-        git tag "v__FIXME__"
+        git commit --all -m "v$(make version)"
+        git tag "v$(make version)"
         git push --tags
