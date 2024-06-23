@@ -7,6 +7,7 @@ keywords = ["TKY2JGD", "PatchJGD", "JGD2000", "JGD2011"]
 license = "MIT"
 documentation = "https://docs.rs/jgd"
 repository = "https://github.com/p4ken/jgd"
+exclude = [".*", "Makefile"]
 
 [workspace]
 members = ["par/conv"]

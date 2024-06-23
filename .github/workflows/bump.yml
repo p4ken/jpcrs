@@ -1,29 +1,24 @@
 name: Bump version
-
 on:
   workflow_dispatch:
     inputs:
       bump:
         type: choice
         options:
-          - beta
           - patch
-
 env:
   CARGO_TERM_COLOR: always
-
 jobs:
   bump:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install cargo set-version
-      run: cargo install cargo-edit
-    - name: Bump
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "<>"
-        cargo set-version --package jgd --bump ${{ inputs.bump }}
-        git commit --all -m "v$(make version)"
-        git tag "v$(make version)"
-        git push --tags
+    - uses: actions/cache@v4
+      with:
+        path: ~/.cargo/
+        key: ${{ runner.os }}-cargo-bump
+    - run: cargo install --git https://github.com/watsom27/cargo-bump.git --branch workspaces
+    - run: cargo bump --package jgd ${{ inputs.bump }}
+    - run: git commit --all --message "v$(make version)"
+    - run: git tag "v$(make version)"
+    - run: git push --tags
