@@ -28,4 +28,4 @@ jobs:
     - run: git commit --all --message "v$(make version)"
     - run: git tag "v$(make version)" --message ""
     - run: git push --follow-tags
-    - run: cargo publish --dry-run
+    - run: cargo publish
