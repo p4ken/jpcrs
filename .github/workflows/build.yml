@@ -18,6 +18,8 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/cache@v4
       with:
-        path: target/
+        path: |
+          ~/.cargo/
+          target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.toml') }}
     - run: make test
