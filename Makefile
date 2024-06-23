@@ -1,4 +1,3 @@
-
 all: test package doc version
 
 test: test-all test-default test-tky2jgd test-patchjgd

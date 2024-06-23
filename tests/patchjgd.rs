@@ -20,7 +20,7 @@ fn iwaki_1() {
     assert_abs_diff_eq!(lon, 140.840375142, epsilon = MM_IN_DEGREES);
 }
 
-/// パラメータグリッドの欠損地域
+/// パラメータグリッドがない地域
 #[test]
 fn iwaki_2() {
     let (lat, lon) = jgd::from_jgd2000(37.093698, 140.829111).to_jgd2011().into();
