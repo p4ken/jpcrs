@@ -1,0 +1,24 @@
+[package]
+name = "jgd"
+version = "0.1.0"
+edition = "2021"
+description = "Transform geodetic datums used in Japan"
+keywords = ["TKY2JGD", "PatchJGD", "JGD2000", "JGD2011"]
+license = "MIT"
+documentation = "https://docs.rs/jgd"
+repository = "https://github.com/p4ken/jgd"
+exclude = [".*", "Makefile"]
+
+[workspace]
+members = ["par/conv"]
+
+[features]
+default = ["tky2jgd", "patchjgd"]
+tky2jgd = []
+patchjgd = []
+
+[dependencies]
+
+[dev-dependencies]
+approx = "0.5.1"
+geo = "0.28.0"
