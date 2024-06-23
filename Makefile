@@ -1,13 +1,13 @@
 
 all: test package doc version
 
-test: test-min test-default
+test: test-all test-default test-tky2jgd test-patchjgd
 
-test-min: FORCE
-	cargo test --release --no-default-features --all-targets  # without doc
+test-all: FORCE
+	cargo test --release --all-features
 
-test-default: FORCE
-	cargo test --release
+test-%: FORCE
+	cargo test --release --no-default-features --features $* --all-targets  # without doc
 
 package: FORCE
 	cargo package --allow-dirty
