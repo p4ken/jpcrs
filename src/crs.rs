@@ -138,7 +138,7 @@ impl Tokyo97 {
     /// use jgd::{LatLon, Tokyo97};
     ///
     /// let tokyo97 = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
-    /// let jgd2000 = Tokyo97::new(tokyo97).to_jgd2000().lat_lon();
+    /// let jgd2000 = Tokyo97::new(tokyo97).to_jgd2000().degrees();
     /// ```
     ///
     /// # See also
@@ -194,7 +194,7 @@ impl Jgd2000 {
     /// use jgd::{LatLon, Jgd2000};
     ///
     /// let jgd2000 = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
-    /// let jgd2011 = Jgd2000::new(jgd2000).to_jgd2011().lat_lon();
+    /// let jgd2011 = Jgd2000::new(jgd2000).to_jgd2011().degrees();
     /// ```
     ///
     /// # See also
