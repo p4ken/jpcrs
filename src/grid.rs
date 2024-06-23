@@ -2,11 +2,15 @@ use crate::LatLon;
 
 /// 日本測地系から世界測地系への座標変換パラメータ。
 ///
+/// たとえ陸地であっても、無人島や、後年に埋め立てられた沿岸部などで、パラメータグリッドが欠損している。
+///
 /// 出典: 国土地理院 [TKY2JGD.par](https://www.gsi.go.jp/sokuchikijun/tky2jgd_download.html) (Ver.2.1.2, 2003年公開) をもとに形式を変換して作成。
 #[cfg(feature = "tky2jgd")]
 pub const TKY2JGD: Grid = crate::par::TKY2JGD.to_grid();
 
 /// 平成23年(2011年)東北地方太平洋沖地震の座標補正パラメータ。
+///
+/// 3月11日以降に複雑な地殻変動をともなう地震の発生した地域では、パラメータが欠損している。
 ///
 /// 出典: 国土地理院 [touhokutaiheiyouoki2011.par](https://www.gsi.go.jp/sokuchikijun/sokuchikijun41012.html) (Ver.4.0.0, 2017年公開) をもとに形式を変換して作成。
 #[cfg(feature = "patchjgd")]

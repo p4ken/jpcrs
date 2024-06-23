@@ -57,6 +57,7 @@ impl LatLon {
     pub fn to_degrees(&self) -> (f64, f64) {
         (self.lat, self.lon)
     }
+
     /// 度分秒に変換する。
     /// Converts to degrees, minutes, seconds.
     pub fn to_dms(&self) -> (Dms, Dms) {
@@ -110,8 +111,16 @@ impl Div<f64> for LatLon {
 /// Degrees, minutes, seconds.
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Dms {
+    /// 度。
+    /// Degrees.
     pub d: i32,
+
+    /// 分。
+    /// Minutes.
     pub m: i32,
+
+    /// 秒。
+    /// Seconds.
     pub s: f64,
 }
 impl Dms {
