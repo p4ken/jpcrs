@@ -34,3 +34,15 @@ fn from_dms() {
     assert_eq!(lat, 1.11);
     assert_eq!(lon, 2.50);
 }
+
+#[test]
+fn to_dms() {
+    let (lat, lon) = LatLon::from_degrees(1.11, 2.50).to_dms();
+    assert_eq!(lat.d, 1);
+    assert_eq!(lat.m, 6);
+    assert_eq!(lat.s.round(), 36.);
+
+    assert_eq!(lon.d, 2);
+    assert_eq!(lon.m, 30);
+    assert_eq!(lon.s.round(), 0.);
+}

@@ -1,17 +1,17 @@
-//! 国土地理院によるオリジナルのTKY2JGDと比較するテスト。
+//! 国土地理院によるオリジナルの TKY2JGD と比較するテスト。
 #![cfg(feature = "tky2jgd")]
 
 use approx::assert_abs_diff_eq;
 use jgd::{LatLon, Tokyo};
 
 /// 許容誤差: ±1mm
-const MILLI_METER_IN_DEGREES: f64 = 0.000000009;
+const MM_IN_DEGREES: f64 = 0.000000009;
 
 fn assert_tky2jgd(tokyo: LatLon, expected: LatLon) {
     let (lat0, lon0) = expected.to_degrees();
     let (lat1, lon1) = Tokyo::new(tokyo).to_jgd2000().lat_lon().to_degrees();
-    assert_abs_diff_eq!(lat0, lat1, epsilon = MILLI_METER_IN_DEGREES);
-    assert_abs_diff_eq!(lon0, lon1, epsilon = MILLI_METER_IN_DEGREES);
+    assert_abs_diff_eq!(lat0, lat1, epsilon = MM_IN_DEGREES);
+    assert_abs_diff_eq!(lon0, lon1, epsilon = MM_IN_DEGREES);
 }
 
 #[test]

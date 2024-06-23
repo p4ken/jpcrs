@@ -42,7 +42,7 @@ impl FromStr for Record {
     type Err = Infallible;
 
     fn from_str(mut line: &str) -> Result<Record, Self::Err> {
-        fn parse_number(line: &mut &str, end: usize) -> anyhow::Result<i64> {
+        fn parse_number(line: &mut &str, end: usize) -> anyhow::Result<f64> {
             ensure!(line.len() >= end);
             let (number, rest) = (&line[..end], &line[end..]);
             *line = rest;
@@ -53,7 +53,9 @@ impl FromStr for Record {
         }
 
         fn parse_meshcode(line: &mut &str, chunk: usize) -> anyhow::Result<(i64, i64)> {
-            Ok((parse_number(line, chunk)?, parse_number(line, chunk)?))
+            let lat = parse_number(line, chunk)? as i64;
+            let lon = parse_number(line, chunk)? as i64;
+            Ok((lat, lon))
         }
 
         let (mesh1_lat, mesh1_lon) = parse_meshcode(&mut line, 2).expect("1st mesh");
@@ -69,20 +71,14 @@ impl FromStr for Record {
         let index_lat = to_grid_index(mesh1_lat, mesh2_lat, mesh3_lat).expect("lat");
         let index_lon = to_grid_index(mesh1_lon + 100, mesh2_lon, mesh3_lon).expect("lon");
 
-        fn parse_diff(line: &mut &str) -> anyhow::Result<i32> {
-            let d_integer = parse_number(line, 4)?;
-            *line = line.strip_prefix(".").context("expected decimal point")?;
-            let d_decimal = parse_number(line, 5)?;
-
-            // Remove decimal point (.)
-            let sign = 1 - (d_integer < 0) as i64 * 2;
-            (d_integer * 1_000_000 + d_decimal * 10 * sign)
-                .try_into()
-                .context("diff overflowed")
+        fn parse_usec(line: &mut &str) -> anyhow::Result<i32> {
+            let us = (parse_number(line, 10)? * 1_000_000.) as i32;
+            ensure!(us.abs() < i32::MAX);
+            Ok(us)
         }
 
-        let d_lat_us = parse_diff(&mut line).expect("dB(sec)");
-        let d_lon_us = parse_diff(&mut line).expect("dL(sec)");
+        let d_lat_us = parse_usec(&mut line).expect("dB(sec)");
+        let d_lon_us = parse_usec(&mut line).expect("dL(sec)");
 
         Ok(Record(index_lat, index_lon, d_lat_us, d_lon_us))
     }
