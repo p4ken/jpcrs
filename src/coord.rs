@@ -8,14 +8,9 @@ pub struct LatLon {
     lon: f64,
 }
 impl LatLon {
-    fn new(lat: f64, lon: f64) -> Self {
+    pub(crate) fn new<T: Into<f64>>(lat: T, lon: T) -> Self {
+        let (lat, lon) = (lat.into(), lon.into());
         Self { lat, lon }
-    }
-
-    /// 度から変換する。
-    /// Converts from degrees.
-    pub fn from_degrees<T: Into<f64>>(lat: T, lon: T) -> Self {
-        Self::new(lat.into(), lon.into())
     }
 
     /// 度分秒から変換する。
@@ -31,13 +26,13 @@ impl LatLon {
     /// let origin = LatLon::from_dms((35, 39, 29.1572), (139, 44, 28.8869));
     /// ```
     pub fn from_dms<T: Into<Dms>>(lat: T, lon: T) -> Self {
-        Self::from_degrees(lat.into().to_degrees(), lon.into().to_degrees())
+        Self::new(lat.into().to_degrees(), lon.into().to_degrees())
     }
 
     /// 秒から変換する。
     /// Converts from seconds.
     pub fn from_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
-        Self::from_degrees(lat.into(), lon.into()) / 3_600.
+        Self::new(lat.into(), lon.into()) / 3_600.
     }
 
     /// ミリ秒から度に変換する。
@@ -50,12 +45,6 @@ impl LatLon {
     /// Converts from microseconds.
     pub fn from_micro_secs<T: Into<f64>>(lat: T, lon: T) -> Self {
         Self::from_milli_secs(lat, lon) / 1_000.
-    }
-
-    /// 度に変換する。
-    /// Converts to degrees.
-    pub fn to_degrees(&self) -> (f64, f64) {
-        (self.lat, self.lon)
     }
 
     /// 度分秒に変換する。
@@ -104,6 +93,11 @@ impl Div<f64> for LatLon {
     type Output = Self;
     fn div(self, rhs: f64) -> Self::Output {
         self.map(|x| x / rhs)
+    }
+}
+impl From<LatLon> for (f64, f64) {
+    fn from(degree: LatLon) -> Self {
+        (degree.lat, degree.lon)
     }
 }
 

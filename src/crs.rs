@@ -19,7 +19,7 @@ use crate::TOUHOKUTAIHEIYOUOKI2011;
 /// let (lat, lon) = jgd::from_tokyo(35.0, 135.0).to_jgd2000().into();
 /// ```
 pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
-    Tokyo::new(LatLon::from_degrees(lat, lon))
+    Tokyo::new(LatLon::new(lat, lon))
 }
 
 /// [`Tokyo97`] から変換する。
@@ -31,7 +31,7 @@ pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
 /// let (lat, lon) = jgd::from_tokyo97(35.0, 135.0).to_jgd2000().into();
 /// ```
 pub fn from_tokyo97(lat: f64, lon: f64) -> Tokyo97 {
-    Tokyo97::new(LatLon::from_degrees(lat, lon))
+    Tokyo97::new(LatLon::new(lat, lon))
 }
 
 /// [`Jgd2000`] から変換する。
@@ -43,13 +43,13 @@ pub fn from_tokyo97(lat: f64, lon: f64) -> Tokyo97 {
 /// let (lat, lon) = jgd::from_jgd2000(35.0, 135.0).to_jgd2011().into();
 /// ```
 pub fn from_jgd2000(lat: f64, lon: f64) -> Jgd2000 {
-    Jgd2000::new(LatLon::from_degrees(lat, lon))
+    Jgd2000::new(LatLon::new(lat, lon))
 }
 
 /// [`Jgd2011`] から変換する。
 /// Transform from a coordinate in JGD2011.
 fn _from_jgd2011(lat: f64, lon: f64) -> Jgd2011 {
-    Jgd2011::new(LatLon::from_degrees(lat, lon))
+    Jgd2011::new(LatLon::new(lat, lon))
 }
 
 /// 旧日本測地系。Tokyo Datum, The older Japanese Datum.
@@ -68,7 +68,7 @@ impl Tokyo {
     /// use jgd::{LatLon, Tokyo};
     ///
     /// let tokyo = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
-    /// let jgd2000 = Tokyo::new(tokyo).to_jgd2000().lat_lon();
+    /// let jgd2000 = Tokyo::new(tokyo).to_jgd2000().degrees();
     /// ```
     ///
     /// # See also
@@ -106,7 +106,7 @@ impl Tokyo {
 
     /// 緯度経度。
     /// Latitude and longitude.
-    pub fn lat_lon(&self) -> LatLon {
+    pub fn degrees(&self) -> LatLon {
         self.degrees
     }
 }
@@ -114,7 +114,7 @@ impl From<Tokyo> for (f64, f64) {
     /// 度単位の緯度と経度のペア。
     /// Latitude and longitude in degrees.
     fn from(tokyo: Tokyo) -> Self {
-        tokyo.lat_lon().to_degrees()
+        tokyo.degrees().into()
     }
 }
 
@@ -174,7 +174,7 @@ impl From<Tokyo97> for (f64, f64) {
     /// 度単位の緯度と経度のペア。
     /// Latitude and longitude in degrees.
     fn from(tokyo97: Tokyo97) -> Self {
-        tokyo97.lat_lon().to_degrees()
+        tokyo97.lat_lon().into()
     }
 }
 
@@ -229,7 +229,7 @@ impl Jgd2000 {
 
     /// 緯度経度。
     /// Latitude and longitude.
-    pub fn lat_lon(&self) -> LatLon {
+    pub fn degrees(&self) -> LatLon {
         self.degrees
     }
 }
@@ -237,7 +237,7 @@ impl From<Jgd2000> for (f64, f64) {
     /// 度単位の緯度と経度のペア。
     /// Latitude and longitude in degrees.
     fn from(jgd2000: Jgd2000) -> Self {
-        jgd2000.lat_lon().to_degrees()
+        jgd2000.degrees().into()
     }
 }
 
@@ -258,7 +258,7 @@ impl Jgd2011 {
 
     /// 緯度経度。
     /// Latitude and longitude.
-    pub fn lat_lon(&self) -> LatLon {
+    pub fn degrees(&self) -> LatLon {
         self.degrees
     }
 }
@@ -266,7 +266,7 @@ impl From<Jgd2011> for (f64, f64) {
     /// 度単位の緯度と経度のペア。
     /// Latitude and longitude in degrees.
     fn from(jgd2011: Jgd2011) -> Self {
-        jgd2011.lat_lon().to_degrees()
+        jgd2011.degrees().into()
     }
 }
 
