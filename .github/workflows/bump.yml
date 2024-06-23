@@ -6,6 +6,7 @@ on:
         type: choice
         options:
           - patch
+          - minor
 permissions:
   contents: write
 env:

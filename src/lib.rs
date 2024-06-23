@@ -65,9 +65,7 @@ mod island;
 mod par;
 
 pub use coord::{Dms, LatLon};
-pub use crs::{
-    from_jgd2000, from_jgd2011, from_tokyo, from_tokyo97, Jgd2000, Jgd2011, Tokyo, Tokyo97,
-};
+pub use crs::{from_jgd2000, from_tokyo, from_tokyo97, Jgd2000, Jgd2011, Tokyo, Tokyo97};
 pub use grid::Grid;
 #[cfg(feature = "tky2jgd")]
 pub use grid::TKY2JGD;
