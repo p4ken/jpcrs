@@ -19,6 +19,7 @@ jobs:
         key: ${{ runner.os }}-cargo-bump
     - run: cargo install --git https://github.com/watsom27/cargo-bump.git --branch workspaces
     - run: cargo bump --package jgd ${{ inputs.bump }}
+    - uses: fregante/setup-git-user@v2
     - run: git commit --all --message "v$(make version)"
     - run: git tag "v$(make version)"
     - run: git push --tags
