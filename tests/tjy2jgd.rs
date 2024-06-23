@@ -7,9 +7,10 @@ use jgd::{LatLon, Tokyo};
 const MILLI_METER_IN_DEGREES: f64 = 0.000000009;
 
 fn assert_tky2jgd(tokyo: LatLon, jgd2000: LatLon) {
-    let ret = Tokyo::new(tokyo).to_jgd2000().degrees();
-    assert_abs_diff_eq!(jgd2000.lat(), ret.lat(), epsilon = MILLI_METER_IN_DEGREES);
-    assert_abs_diff_eq!(jgd2000.lon(), ret.lon(), epsilon = MILLI_METER_IN_DEGREES);
+    let (lat0, lon0) = jgd2000.to_degrees();
+    let (lat1, lon1) = Tokyo::new(tokyo).to_jgd2000().lat_lon().to_degrees();
+    assert_abs_diff_eq!(lat0, lat1, epsilon = MILLI_METER_IN_DEGREES);
+    assert_abs_diff_eq!(lon0, lon1, epsilon = MILLI_METER_IN_DEGREES);
 }
 
 #[test]

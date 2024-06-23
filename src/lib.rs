@@ -1,3 +1,5 @@
+// release build fails on warnings
+#![cfg_attr(not(debug_assertions), deny(warnings))]
 // doc requres nightly
 #![cfg_attr(all(doc, not(doctest)), feature(doc_auto_cfg))]
 
@@ -59,6 +61,7 @@ mod crs;
 mod earth;
 mod grid;
 mod island;
+#[cfg(any(feature = "tky2jgd", feature = "patchjgd"))]
 mod par;
 
 pub use coord::{Dms, LatLon};

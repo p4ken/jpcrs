@@ -21,24 +21,20 @@ use crate::TOUHOKUTAIHEIYOUOKI2011;
 /// jgd::from_tokyo(35.0, 135.0);
 /// ```
 pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
-    Tokyo::new(LatLon::new(lat, lon))
+    Tokyo::new(LatLon::from_degrees(lat, lon))
 }
 
 pub fn from_tokyo97(lat: f64, lon: f64) -> Tokyo97 {
-    Tokyo97::new(LatLon::new(lat, lon))
+    Tokyo97::new(LatLon::from_degrees(lat, lon))
 }
 
 pub fn from_jgd2000(lat: f64, lon: f64) -> Jgd2000 {
-    Jgd2000::new(LatLon::new(lat, lon))
+    Jgd2000::new(LatLon::from_degrees(lat, lon))
 }
 
 pub fn from_jgd2011(lat: f64, lon: f64) -> Jgd2000 {
-    Jgd2000::new(LatLon::new(lat, lon))
+    Jgd2000::new(LatLon::from_degrees(lat, lon))
 }
-
-// pub fn from_tokyo_(p: impl Into<LatLon>) -> Tokyo {
-//     Tokyo(p.into())
-// }
 
 /// 旧日本測地系。Tokyo Datum, The older Japanese Datum.
 ///
@@ -56,7 +52,7 @@ impl Tokyo {
     /// use jgd::{LatLon, Tokyo};
     ///
     /// let tokyo = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
-    /// let jgd2000 = Tokyo::new(tokyo).to_jgd2000().degrees();
+    /// let jgd2000 = Tokyo::new(tokyo).to_jgd2000().lat_lon();
     /// ```
     ///
     /// <br>
@@ -133,7 +129,7 @@ pub struct Jgd2000 {
 }
 impl Jgd2000 {
     /// ...
-    fn new(degrees: LatLon) -> Self {
+    pub fn new(degrees: LatLon) -> Self {
         Self { degrees }
     }
 
@@ -164,7 +160,7 @@ impl Jgd2000 {
     fn _to_tokyo97(&self) {}
 
     /// ...
-    pub fn degrees(&self) -> LatLon {
+    pub fn lat_lon(&self) -> LatLon {
         self.degrees
     }
 }
@@ -178,20 +174,16 @@ pub struct Jgd2011 {
 }
 impl Jgd2011 {
     /// ...
-    fn new(degrees: LatLon) -> Self {
+    pub fn new(degrees: LatLon) -> Self {
         Self { degrees }
     }
-
-    // pub fn lon_lat(&self) -> (f64, f64) {
-    //     self.lat_lon.rev()
-    // }
 
     /// [`TOUHOKUTAIHEIYOUOKI2011`] を用いて [`Jgd2000`] へ逆変換する。
     pub fn to_jgd2000(&self) {}
 }
 impl From<Jgd2011> for (f64, f64) {
     fn from(jgd2011: Jgd2011) -> Self {
-        jgd2011.degrees.into()
+        jgd2011.degrees.to_degrees()
     }
 }
 

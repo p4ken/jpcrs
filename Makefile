@@ -1,13 +1,12 @@
 
 all: test package doc version
 
-test: test-min test-r
-	cargo test
+test: test-min test-default
 
 test-min: FORCE
-	cargo test --no-default-features --all-targets  # without doc
+	cargo test --release --no-default-features --all-targets  # without doc
 
-test-r: FORCE
+test-default: FORCE
 	cargo test --release
 
 package: FORCE

@@ -1,16 +1,16 @@
-use crate::{par, LatLon};
+use crate::LatLon;
 
 /// 日本測地系から世界測地系への座標変換パラメータ。
 ///
 /// 出典: 国土地理院 [TKY2JGD.par](https://www.gsi.go.jp/sokuchikijun/tky2jgd_download.html) (Ver.2.1.2, 2003年公開) をもとに形式を変換して作成。
 #[cfg(feature = "tky2jgd")]
-pub const TKY2JGD: Grid = par::TKY2JGD.to_grid();
+pub const TKY2JGD: Grid = crate::par::TKY2JGD.to_grid();
 
 /// 平成23年(2011年)東北地方太平洋沖地震の座標補正パラメータ。
 ///
 /// 出典: 国土地理院 [touhokutaiheiyouoki2011.par](https://www.gsi.go.jp/sokuchikijun/sokuchikijun41012.html) (Ver.4.0.0, 2017年公開) をもとに形式を変換して作成。
 #[cfg(feature = "patchjgd")]
-pub const TOUHOKUTAIHEIYOUOKI2011: Grid = par::TOUHOKUTAIHEIYOUOKI2011.to_grid();
+pub const TOUHOKUTAIHEIYOUOKI2011: Grid = crate::par::TOUHOKUTAIHEIYOUOKI2011.to_grid();
 
 /// パラメータグリッド。
 /// Parameters grid.
@@ -19,6 +19,7 @@ pub struct Grid<'a> {
     dots: &'a [Dot],
 }
 impl<'a> Grid<'a> {
+    #[allow(dead_code)]
     pub(crate) const fn new(dots: &'a [Dot]) -> Self {
         Self { dots }
     }
@@ -43,8 +44,8 @@ impl<'a> Grid<'a> {
         let i = self.search_at(i + 1, mesh.north().east())?;
         let ne_shift = self.dots[i].shift;
 
-        let (n_weight, e_weight) = mesh.diagonal_weight(p).into();
-        let (s_weight, w_weight) = mesh.north().east().diagonal_weight(p).into();
+        let (n_weight, e_weight) = mesh.diagonal_weight(p).to_degrees();
+        let (s_weight, w_weight) = mesh.north().east().diagonal_weight(p).to_degrees();
 
         // weighted mean
         let shift = sw_shift.to_degree() * s_weight * w_weight
@@ -104,7 +105,7 @@ impl Mesh3 {
         let min_degree = self.to_degree();
         let weight_lat = (p.lat() - min_degree.lat()).abs() * 3_600. / Self::LAT_SEC;
         let weight_lon = (p.lon() - min_degree.lon()).abs() * 3_600. / Self::LON_SEC;
-        LatLon::new(weight_lat, weight_lon)
+        LatLon::from_degrees(weight_lat, weight_lon)
     }
     fn north(mut self) -> Self {
         self.lat += 1;
@@ -131,7 +132,7 @@ impl MicroSecond {
     fn to_degree(self) -> LatLon {
         let lat = f64::from(self.lat) / 3_600_000_000.;
         let lon = f64::from(self.lon) / 3_600_000_000.;
-        LatLon::new(lat, lon)
+        LatLon::from_degrees(lat, lon)
     }
 }
 
@@ -180,7 +181,7 @@ mod tests {
     #[test]
     fn interpolate_corner() {
         let sut = Grid::new(&SMALLEST);
-        let ret = sut.bilinear(LatLon::new(0.0, 0.0)).unwrap();
+        let ret = sut.bilinear(LatLon::from_degrees(0.0, 0.0)).unwrap();
         assert_eq!(ret.lon(), 0.0);
         assert_eq!(ret.lat(), -6. / 3_600_000_000.);
     }
