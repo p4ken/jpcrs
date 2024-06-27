@@ -67,6 +67,8 @@ mod crs;
 mod earth;
 mod grid;
 mod island;
+pub mod neo1;
+pub mod neo2;
 #[cfg(any(feature = "tky2jgd", feature = "patchjgd"))]
 mod par;
 
