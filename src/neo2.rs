@@ -1,4 +1,4 @@
-mod jgd {
+pub mod jgd {
     use super::{LatLon, Tokyo};
 
     pub fn from_tokyo(degrees: LatLon) -> Tokyo {
