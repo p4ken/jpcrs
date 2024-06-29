@@ -9,16 +9,15 @@ impl Tokyo {
         Jgd2000
     }
 }
-impl From<LatLon> for Tokyo {
-    fn from(_: LatLon) -> Self {
+impl Degrees for Tokyo {
+    fn with_degrees(lat: f64, lon: f64) -> Self {
         Self
     }
-}
-impl From<Tokyo> for LatLon {
-    fn from(_: Tokyo) -> Self {
-        Self
+    fn degrees(self) -> (f64, f64) {
+        (0., 0.)
     }
 }
+
 pub struct Jgd2000;
 impl Jgd2000 {
     pub fn to_jgd2011(self) -> Jgd2011 {
@@ -31,14 +30,12 @@ impl From<Jgd2011> for (f64, f64) {
         crs.degrees()
     }
 }
-impl From<LatLon> for Jgd2011 {
-    fn from(_: LatLon) -> Self {
+impl Degrees for Jgd2011 {
+    fn with_degrees(lat: f64, lon: f64) -> Self {
         Self
     }
-}
-impl From<Jgd2011> for LatLon {
-    fn from(_: Jgd2011) -> Self {
-        Self
+    fn degrees(self) -> (f64, f64) {
+        (0., 0.)
     }
 }
 
@@ -51,14 +48,6 @@ pub trait Degrees: Sized {
     fn degrees(self) -> (f64, f64);
     fn secs(self) -> (f64, f64) {
         self.degrees()
-    }
-}
-impl<T: From<LatLon> + Into<LatLon>> Degrees for T {
-    fn with_degrees(lat: f64, lon: f64) -> Self {
-        LatLon.into()
-    }
-    fn degrees(self) -> (f64, f64) {
-        (0., 0.)
     }
 }
 pub struct LatLon;
