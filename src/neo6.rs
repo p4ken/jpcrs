@@ -74,6 +74,7 @@ impl LatLon {
 pub fn usage() {
     use geo::Point;
 
+    //　やはりベストか
     let LatLon(lat, lon) = Tokyo::with_degrees(LatLon(0., 0.))
         .to_jgd2000()
         .to_jgd2011()

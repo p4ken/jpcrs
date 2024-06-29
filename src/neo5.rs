@@ -13,8 +13,8 @@ impl Degrees for Tokyo {
     fn with_degrees(lat: f64, lon: f64) -> Self {
         Self
     }
-    fn degrees(self) -> (f64, f64) {
-        (0., 0.)
+    fn degrees<T: From<LatLon>>(self) -> T {
+        LatLon(0., 0.).into()
     }
 }
 
@@ -44,8 +44,8 @@ impl Degrees for Jgd2011 {
     fn with_degrees(lat: f64, lon: f64) -> Self {
         Self
     }
-    fn degrees(self) -> (f64, f64) {
-        (0., 0.)
+    fn degrees<T: From<LatLon>>(self) -> T {
+        LatLon(0., 0.).into()
     }
 }
 
@@ -55,12 +55,25 @@ pub trait Degrees: Sized {
     fn with_secs(lat: f64, lon: f64) -> Self {
         Self::with_degrees(lat, lon)
     }
-    fn degrees(self) -> (f64, f64);
-    fn secs(self) -> (f64, f64) {
+    fn degrees<T: From<LatLon>>(self) -> T;
+    fn secs<T: From<LatLon>>(self) -> T {
         self.degrees()
     }
 }
 pub struct LatLon(f64, f64);
+impl LatLon {
+    pub fn lat(&self) -> f64 {
+        self.0
+    }
+    pub fn lon(&self) -> f64 {
+        self.1
+    }
+}
+impl From<LatLon> for (f64, f64) {
+    fn from(value: LatLon) -> Self {
+        todo!()
+    }
+}
 // impl Degrees for LatLon {
 //     fn with_degrees(lat: f64, lon: f64) -> Self {
 //         todo!()
@@ -83,6 +96,13 @@ pub fn usage() {
         .to_jgd2000()
         .to_jgd2011()
         .degrees();
+
+    // 使いにくい 分かりにくい
+    let jgd2000 = Tokyo::with_degrees(1., 2.)
+        .to_jgd2000()
+        .to_jgd2011()
+        .degrees::<LatLon>();
+    jgd2000.lat();
 
     let (lat, lon) = Tokyo::with_secs(1., 2.).to_jgd2000().to_jgd2011().secs();
 
