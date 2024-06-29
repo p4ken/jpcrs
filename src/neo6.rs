@@ -7,7 +7,7 @@ impl Tokyo {
     }
 }
 impl Degrees for Tokyo {
-    fn with_degrees(degrees: LatLon) -> Self {
+    fn with_degrees(degrees: impl Into<LatLon>) -> Self {
         Self
     }
     fn degrees(&self) -> LatLon {
@@ -23,7 +23,7 @@ impl Jgd2000 {
 }
 pub struct Jgd2011;
 impl Degrees for Jgd2011 {
-    fn with_degrees(degrees: LatLon) -> Self {
+    fn with_degrees(degrees: impl Into<LatLon>) -> Self {
         Self
     }
     fn degrees(&self) -> LatLon {
@@ -33,7 +33,8 @@ impl Degrees for Jgd2011 {
 
 // TODO sealed
 pub trait Degrees: Sized {
-    fn with_degrees(degrees: LatLon) -> Self;
+    // TODO: Into要らないかも
+    fn with_degrees(degrees: impl Into<LatLon>) -> Self;
     fn with_secs(secs: LatLon) -> Self {
         Self::with_degrees(secs)
     }
@@ -51,10 +52,10 @@ impl LatLon {
     pub fn into_rev<T: From<[f64; 2]>>(&self) -> T {
         [self.lon(), self.lat()].into()
     }
-    pub fn lon(&self) -> f64 {
+    pub fn lat(&self) -> f64 {
         self.0
     }
-    pub fn lat(&self) -> f64 {
+    pub fn lon(&self) -> f64 {
         self.1
     }
 }

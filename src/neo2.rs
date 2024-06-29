@@ -111,6 +111,7 @@ impl<T: From<LatLon> + Into<LatLon>> Degrees for T {
 }
 
 #[allow(unused_variables)]
+#[cfg(feature = "default")]
 mod tests {
     use super::{jgd, Degrees, LatLon, Tokyo};
 

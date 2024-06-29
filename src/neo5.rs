@@ -2,7 +2,7 @@
 
 pub struct Tokyo;
 impl Tokyo {
-    pub fn new(lat: f64, lon: f64) -> Self {
+    pub fn new(lat_lon: LatLon) -> Self {
         Self
     }
     pub fn to_jgd2000(self) -> Jgd2000 {
@@ -25,11 +25,21 @@ impl Jgd2000 {
     }
 }
 pub struct Jgd2011;
-impl From<Jgd2011> for (f64, f64) {
-    fn from(crs: Jgd2011) -> Self {
-        crs.degrees()
+impl Jgd2011 {
+    fn lat_lon(&self) -> LatLon {
+        LatLon(0., 0.)
     }
 }
+// impl From<Jgd2011> for (f64, f64) {
+//     fn from(crs: Jgd2011) -> Self {
+//         crs.degrees()
+//     }
+// }
+// impl AsRef<LatLon> for Jgd2011 {
+//     fn as_ref(&self) -> &LatLon {
+//         &LatLon(0., 0.)
+//     }
+// }
 impl Degrees for Jgd2011 {
     fn with_degrees(lat: f64, lon: f64) -> Self {
         Self
@@ -50,13 +60,36 @@ pub trait Degrees: Sized {
         self.degrees()
     }
 }
-pub struct LatLon;
+pub struct LatLon(f64, f64);
+// impl Degrees for LatLon {
+//     fn with_degrees(lat: f64, lon: f64) -> Self {
+//         todo!()
+//     }
+//     fn degrees(self) -> (f64, f64) {
+//         todo!()
+//     }
+// }
 
+#[cfg(test)]
 pub fn usage() {
-    let (lat, lon) = Tokyo::new(1., 2.).to_jgd2000().to_jgd2011().into();
+    use geo::Point;
+
+    // let (lat, lon) = Tokyo::new(LatLon(1., 2.))
+    //     .to_jgd2000()
+    //     .to_jgd2011()
+    //     .lat_lon()
+    //     .secs();
     let (lat, lon) = Tokyo::with_degrees(1., 2.)
         .to_jgd2000()
         .to_jgd2011()
         .degrees();
+
     let (lat, lon) = Tokyo::with_secs(1., 2.).to_jgd2000().to_jgd2011().secs();
+
+    let mut p = Point::new(1., 2.);
+    let (lat, lon) = Tokyo::with_degrees(p.y(), p.x())
+        .to_jgd2000()
+        .to_jgd2011()
+        .degrees();
+    p = Point::new(lon, lat);
 }
