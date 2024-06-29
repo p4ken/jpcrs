@@ -2,7 +2,7 @@ pub mod jgd {
     use super::{LatLon, Tokyo};
 
     pub fn from_tokyo(degrees: LatLon) -> Tokyo {
-        Tokyo::from_degrees(degrees)
+        Tokyo::new(degrees)
     }
 }
 
@@ -11,9 +11,6 @@ pub struct Tokyo {
 }
 impl Tokyo {
     pub fn new(degrees: LatLon) -> Self {
-        Self { degrees }
-    }
-    pub fn from_degrees(degrees: LatLon) -> Self {
         Self { degrees }
     }
     pub fn to_jgd2000(&self) -> Jgd2000 {
@@ -37,14 +34,11 @@ pub struct Jgd2000 {
     degrees: LatLon,
 }
 impl Jgd2000 {
-    pub fn degrees(&self) -> LatLon {
+    pub fn to_degrees(&self) -> LatLon {
         self.degrees
     }
-    pub fn to_degrees(&self) -> LatLon {
-        self.degrees()
-    }
     pub fn into_inner(&self) -> LatLon {
-        self.degrees()
+        self.degrees
     }
 }
 impl AsRef<LatLon> for Jgd2000 {
@@ -70,7 +64,7 @@ impl LatLon {
         todo!()
     }
     pub fn as_tokyo(self) -> Tokyo {
-        Tokyo::from_degrees(self)
+        Tokyo::new(self)
     }
     pub fn from_tokyo(self) -> Tokyo {
         self.as_tokyo()
@@ -95,71 +89,78 @@ impl LatLon {
 
 pub trait Degrees: Sized {
     // TODO sealed
+    // fn with_degrees(lat: f64, lon: f64) -> Self;
     fn with_secs(lat: f64, lon: f64) -> Self;
+    // fn degrees(self) -> (f64, f64);
     fn secs(self) -> (f64, f64);
 }
-impl<T: From<LatLon> + Into<LatLon>> Degrees for T
-// where
-//     T: From<LatLon>,
-//     LatLon: for<'a> From<&'a T>,
-{
+impl<T: From<LatLon> + Into<LatLon>> Degrees for T {
+    // fn with_degrees(lat: f64, lon: f64) -> Self {
+    //     LatLon(lat, lon).into()
+    // }
     fn with_secs(lat: f64, lon: f64) -> Self {
         LatLon::from_secs(lat, lon).into()
     }
+    // fn degrees(self) -> (f64, f64) {
+    //     let LatLon(lat, lon) = self.into();
+    //     (lat, lon)
+    // }
     fn secs(self) -> (f64, f64) {
         self.into().to_secs()
     }
 }
 
 #[allow(unused_variables)]
-fn _usage() {
-    // 順序ミス！
-    // let (lon, lat) = Tokyo::new((1., 2.)).to_jgd2000().degrees().into();
+mod tests {
+    use super::{jgd, Degrees, LatLon, Tokyo};
 
-    // Tokyoへの変換に見える
-    // let LatLon(lat, lon) = Tokyo::from_degrees(LatLon(1., 2.))
-    //     .to_jgd2000()
-    //     .as_degrees();
+    fn _usage() {
+        // 順序ミス！
+        // let (lon, lat) = Tokyo::new((1., 2.)).to_jgd2000().degrees().into();
 
-    // 硬派
-    let LatLon(lat, lon) = Tokyo::new(LatLon(1., 2.)).to_jgd2000().into_inner();
+        // 硬派
+        let LatLon(lat, lon) = Tokyo::new(LatLon(1., 2.)).to_jgd2000().into_inner();
 
-    let (lat, lon) = Tokyo::with_secs(1., 2.).to_jgd2000().secs();
+        // ベスト候補
+        let LatLon(lat, lon) = Tokyo::new(LatLon(1., 2.)).to_jgd2000().into();
+        // let (lat, lon) = Tokyo::with_degrees(1., 2.).to_jgd2000().degrees();
+        let (lat, lon) = Tokyo::with_secs(1., 2.).to_jgd2000().secs();
 
-    // 実装の重複が多い
-    // let (lat, lon) = Tokyo::from_secs(1., 2.).to_jgd2000().secs();
+        // 実装の重複が多い
+        // let (lat, lon) = Tokyo::from_secs(1., 2.).to_jgd2000().secs();
 
-    // 標準ライブラリと比べて統一感がない？
-    let LatLon(lat, lon) = jgd::from_tokyo(LatLon(1., 2.)).to_jgd2000().degrees();
-    let LatLon(lat, lon) = *jgd::from_tokyo(LatLon(1., 2.)).to_jgd2000().as_ref();
-    let LatLon(lat, lon) = jgd::from_tokyo(LatLon(1., 2.)).to_jgd2000().into();
+        // 標準ライブラリと比べて統一感がない？
+        let LatLon(lat, lon) = jgd::from_tokyo(LatLon(1., 2.)).to_jgd2000().to_degrees();
+        let LatLon(lat, lon) = *jgd::from_tokyo(LatLon(1., 2.)).to_jgd2000().as_ref();
+        let LatLon(lat, lon) = jgd::from_tokyo(LatLon(1., 2.)).to_jgd2000().into();
 
-    let (lat, lon) = jgd::from_tokyo(LatLon::from_secs(1., 2.))
-        .to_jgd2000()
-        .secs();
+        let (lat, lon) = jgd::from_tokyo(LatLon::from_secs(1., 2.))
+            .to_jgd2000()
+            .secs();
 
-    // v0.1
-    // APIが2系統あるのが微妙
-    let (lat, lon) = crate::from_tokyo(1., 2.).to_jgd2000().degrees().into();
+        // v0.1
+        // APIが2系統あるのが微妙
+        let (lat, lon) = crate::from_tokyo(1., 2.).to_jgd2000().degrees().into();
 
-    // LatLon じゃなくなり LatLon に戻す...難解
-    // let LatLon(lat, lon) = LatLon(1., 2.).as_tokyo().to_jgd2000().degrees();
-    let LatLon(lat, lon) = LatLon(1., 2.).from_tokyo().to_jgd2000().degrees();
-    // let LatLon(lat, lon) = LatLon(1., 2.).transform_from_tokyo().to_jgd2000().degrees();
+        // LatLon じゃなくなり LatLon に戻す...難解
+        // let LatLon(lat, lon) = LatLon(1., 2.).as_tokyo().to_jgd2000().degrees();
+        let LatLon(lat, lon) = LatLon(1., 2.).from_tokyo().to_jgd2000().to_degrees();
+        // let LatLon(lat, lon) = LatLon(1., 2.).transform_from_tokyo().to_jgd2000().degrees();
 
-    let (lat, lon) = LatLon::from_secs(1., 2.)
-        .from_tokyo()
-        .to_jgd2000()
-        .degrees()
-        .to_secs();
+        let (lat, lon) = LatLon::from_secs(1., 2.)
+            .from_tokyo()
+            .to_jgd2000()
+            .to_degrees()
+            .to_secs();
 
-    // 単位ミス！
-    // let LatLon(lat, lon) = Tokyo(LatLon::from_seconds(1., 2.)).to_jgd2000().0;
+        // 単位ミス！
+        // let LatLon(lat, lon) = Tokyo(LatLon::from_seconds(1., 2.)).to_jgd2000().0;
 
-    // 入力が冗長
-    // let LatLon(lat, lon) = Tokyo {
-    //     degrees: LatLon(1., 2.),
-    // }
-    // .to_jgd2000()
-    // .degrees;
+        // 入力が冗長
+        // let LatLon(lat, lon) = Tokyo {
+        //     degrees: LatLon(1., 2.),
+        // }
+        // .to_jgd2000()
+        // .degrees;
+    }
 }
