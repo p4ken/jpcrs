@@ -71,6 +71,7 @@ pub mod neo1;
 pub mod neo2;
 pub mod neo3;
 pub mod neo5;
+pub mod neo6;
 #[cfg(any(feature = "tky2jgd", feature = "patchjgd"))]
 mod par;
 
