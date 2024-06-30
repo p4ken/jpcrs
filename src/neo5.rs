@@ -96,6 +96,7 @@ pub fn usage() {
     use jgd::{Geodetic, Tokyo};
 
     // 真のベスト
+    // 果たして bilinear も tuple にするのか？
     let (lat, lon) = Tokyo::new(1., 2.).to_jgd2000().to_jgd2011().into();
 
     let (lat, lon) = Tokyo::with_degrees(1., 2.)
