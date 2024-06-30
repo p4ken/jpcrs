@@ -69,6 +69,9 @@ impl LatLon {
     pub fn in_tokyo(self) -> Tokyo {
         Tokyo::new(self)
     }
+    pub fn in_jgd2000(self) -> Jgd2000 {
+        todo!()
+    }
     pub fn from_tokyo(self) -> Tokyo {
         self.in_tokyo()
     }
@@ -148,6 +151,8 @@ mod tests {
 
         // LatLon じゃなくなり LatLon に戻す...難解
         let LatLon(lat, lon) = LatLon(1., 2.).in_tokyo().to_jgd2000().degrees();
+        // 変換できたと勘違い！
+        let LatLon(lat, lon) = LatLon(1., 2.).in_jgd2000().degrees();
         // let LatLon(lat, lon) = LatLon(1., 2.).from_tokyo().to_jgd2000().to_degrees();
         // let LatLon(lat, lon) = LatLon(1., 2.).transform_from_tokyo().to_jgd2000().degrees();
 
