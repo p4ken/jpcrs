@@ -59,16 +59,38 @@ impl LatLon {
         self.1
     }
 }
-// impl<T: Into<f64>> From<[T; 2]> for LatLon {
-//     fn from([lat, lon]: [T; 2]) -> Self {
-//         Self(lat.into(), lon.into())
-//     }
-// }
+impl<T: Into<f64>> From<[T; 2]> for LatLon {
+    fn from([lat, lon]: [T; 2]) -> Self {
+        Self(lat.into(), lon.into())
+    }
+}
 // impl From<LatLon> for [f64; 2] {
 //     fn from(value: LatLon) -> Self {
 //         [value.lat(), value.lon()]
 //     }
 // }
+
+pub struct XY(f64, f64);
+impl From<(f64, f64)> for XY {
+    fn from(value: (f64, f64)) -> Self {
+        todo!()
+    }
+}
+impl From<XY> for (f64, f64) {
+    fn from(value: XY) -> Self {
+        todo!()
+    }
+}
+impl From<XY> for LatLon {
+    fn from(value: XY) -> Self {
+        todo!()
+    }
+}
+impl From<LatLon> for XY {
+    fn from(value: LatLon) -> Self {
+        todo!()
+    }
+}
 
 #[cfg(test)]
 pub fn usage() {
@@ -80,17 +102,29 @@ pub fn usage() {
         .to_jgd2011()
         .degrees();
 
+    // let [lat, lon] = Tokyo::with_degrees([0., 0.])
+    //     .to_jgd2000()
+    //     .to_jgd2011()
+    //     .degrees()
+    //     .into();
+
     let LatLon(lat, lon) = Tokyo::with_secs(LatLon(0., 0.))
         .to_jgd2000()
         .to_jgd2011()
         .secs();
 
+    // geo に偏りすぎ。他にも geojson は vec だったり色々ある。
     let mut p = Point::new(1., 2.);
     p = Tokyo::with_degrees(LatLon::from_rev(p))
         .to_jgd2000()
         .to_jgd2011()
         .degrees()
         .into_rev();
+    // p = Tokyo::with_degrees(XY::from(p.x_y()))
+    //     .to_jgd2000()
+    //     .to_jgd2011()
+    //     .degrees()
+    //     .into_rev();
 
     let mut p = Point::new(1., 2.);
     let LatLon(y, x) = Tokyo::with_degrees(LatLon(p.y(), p.x()))

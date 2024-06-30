@@ -34,11 +34,14 @@ pub struct Jgd2000 {
     degrees: LatLon,
 }
 impl Jgd2000 {
-    pub fn to_degrees(&self) -> LatLon {
+    pub fn degrees(&self) -> LatLon {
         self.degrees
     }
+    pub fn to_degrees(&self) -> LatLon {
+        self.degrees()
+    }
     pub fn into_inner(&self) -> LatLon {
-        self.degrees
+        self.degrees()
     }
 }
 impl AsRef<LatLon> for Jgd2000 {
@@ -63,14 +66,14 @@ impl LatLon {
     pub fn from_secs(_lat: f64, _lon: f64) -> Self {
         todo!()
     }
-    pub fn as_tokyo(self) -> Tokyo {
+    pub fn in_tokyo(self) -> Tokyo {
         Tokyo::new(self)
     }
     pub fn from_tokyo(self) -> Tokyo {
-        self.as_tokyo()
+        self.in_tokyo()
     }
     pub fn transform_from_tokyo(self) -> Tokyo {
-        self.as_tokyo()
+        self.in_tokyo()
     }
     pub fn to_secs(self) -> (f64, f64) {
         (self.0, self.1)
@@ -144,14 +147,14 @@ mod tests {
         let (lat, lon) = crate::from_tokyo(1., 2.).to_jgd2000().degrees().into();
 
         // LatLon じゃなくなり LatLon に戻す...難解
-        // let LatLon(lat, lon) = LatLon(1., 2.).as_tokyo().to_jgd2000().degrees();
-        let LatLon(lat, lon) = LatLon(1., 2.).from_tokyo().to_jgd2000().to_degrees();
+        let LatLon(lat, lon) = LatLon(1., 2.).in_tokyo().to_jgd2000().degrees();
+        // let LatLon(lat, lon) = LatLon(1., 2.).from_tokyo().to_jgd2000().to_degrees();
         // let LatLon(lat, lon) = LatLon(1., 2.).transform_from_tokyo().to_jgd2000().degrees();
 
         let (lat, lon) = LatLon::from_secs(1., 2.)
-            .from_tokyo()
+            .in_tokyo()
             .to_jgd2000()
-            .to_degrees()
+            .degrees() // secsが欲しいのに
             .to_secs();
 
         // 単位ミス！

@@ -12,11 +12,12 @@ impl LatLon<Degrees> {
         let degrees = Degrees { lat, lon };
         Self { degrees }
     }
-    pub fn from_tokyo(self) -> LatLon<Tokyo> {
+    pub fn in_tokyo(self) -> LatLon<Tokyo> {
         let degrees = Tokyo(self.degrees);
         LatLon { degrees }
     }
 }
+// ドキュメントが見にくい
 impl LatLon<Tokyo> {
     pub fn to_jgd2000(self) -> LatLon<Jgd2000> {
         let degrees = Jgd2000(self.degrees.0);
@@ -73,7 +74,7 @@ mod tests {
 
     fn usage() {
         let (lat, lon) = LatLon::from_secs(0., 1.)
-            .from_tokyo()
+            .in_tokyo()
             .to_jgd2000()
             .to_jgd2011()
             .to_secs();
