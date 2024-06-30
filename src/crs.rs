@@ -1,7 +1,7 @@
 use crate::{
     coord::ECEF,
     earth::{BESSEL, GRS80},
-    LatLon,
+    Degrees, LatLon,
 };
 
 #[cfg(feature = "tky2jgd")]
@@ -9,48 +9,6 @@ use crate::TKY2JGD;
 
 #[cfg(feature = "patchjgd")]
 use crate::TOUHOKUTAIHEIYOUOKI2011;
-
-/// [`Tokyo`] から変換する。
-/// Transform from a coordinate in Tokyo Datum.
-///
-/// # Examples
-///
-/// ```
-/// let (lat, lon) = jgd::from_tokyo(35.0, 135.0).to_jgd2000().into();
-/// ```
-pub fn from_tokyo(lat: f64, lon: f64) -> Tokyo {
-    Tokyo::new(LatLon::new(lat, lon))
-}
-
-/// [`Tokyo97`] から変換する。
-/// Transform from a coordinate in Tokyo97.
-///
-/// # Examples
-///
-/// ```
-/// let (lat, lon) = jgd::from_tokyo97(35.0, 135.0).to_jgd2000().into();
-/// ```
-pub fn from_tokyo97(lat: f64, lon: f64) -> Tokyo97 {
-    Tokyo97::new(LatLon::new(lat, lon))
-}
-
-/// [`Jgd2000`] から変換する。
-/// Transform from a coordinate in JGD2000.
-///
-/// # Examples
-///
-/// ```
-/// let (lat, lon) = jgd::from_jgd2000(35.0, 135.0).to_jgd2011().into();
-/// ```
-pub fn from_jgd2000(lat: f64, lon: f64) -> Jgd2000 {
-    Jgd2000::new(LatLon::new(lat, lon))
-}
-
-/// [`Jgd2011`] から変換する。
-/// Transform from a coordinate in JGD2011.
-fn _from_jgd2011(lat: f64, lon: f64) -> Jgd2011 {
-    Jgd2011::new(LatLon::new(lat, lon))
-}
 
 /// 旧日本測地系。Tokyo Datum, The older Japanese Datum.
 ///
@@ -92,7 +50,7 @@ impl Tokyo {
     #[cfg(feature = "tky2jgd")]
     pub fn to_jgd2000(&self) -> Jgd2000 {
         match TKY2JGD.bilinear(self.degrees) {
-            Some(shift) => Jgd2000::new(self.degrees + shift),
+            Some(shift) => (self.degrees + shift).into(),
             None => self.to_tokyo97().to_jgd2000(),
         }
     }
@@ -101,20 +59,13 @@ impl Tokyo {
     #[allow(dead_code)]
     fn to_tokyo97(&self) -> Tokyo97 {
         // TODO
-        Tokyo97::new(self.degrees)
+        self.degrees.into()
     }
 
     /// 緯度経度。
     /// Latitude and longitude.
     pub fn degrees(&self) -> LatLon {
         self.degrees
-    }
-}
-impl From<Tokyo> for (f64, f64) {
-    /// 度単位の緯度と経度のペア。
-    /// Latitude and longitude in degrees.
-    fn from(tokyo: Tokyo) -> Self {
-        tokyo.degrees().into()
     }
 }
 
@@ -131,21 +82,8 @@ impl Tokyo97 {
 
     /// [`Tokyo97`] から変換する。
     /// Transform from a coordinate in Tokyo97.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use jgd::{LatLon, Tokyo97};
-    ///
-    /// let tokyo97 = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
-    /// let jgd2000 = Tokyo97::new(tokyo97).to_jgd2000().degrees();
-    /// ```
-    ///
-    /// # See also
-    ///
-    /// すでに度単位の座標が分かっている場合は、代わりに [`from_tokyo97`] を使える。
-    pub fn new(degrees: LatLon) -> Self {
-        Self { degrees }
+    fn _new(lat: f64, lon: f64) -> Self {
+        LatLon::new(lat, lon).into()
     }
 
     /// 3パラメータ [(飛田, 2001)](crate#references) を用いて [`Jgd2000`] へ変換する。
@@ -154,7 +92,7 @@ impl Tokyo97 {
         // https://www.gsi.go.jp/LAW/G2000-g2000faq-1.htm
         // > 測地成果2000での経度・緯度は、世界測地系であるITRF94座標系とGRS80の楕円体を使用して表します
         let itrf94 = BESSEL.to_ecef(self.degrees) + Self::TO_ITRF94;
-        Jgd2000::new(GRS80.to_geodetic(itrf94))
+        GRS80.to_geodetic(itrf94).into()
     }
 
     /// 離島位置の補正量 [(飛田, 2003)](crate#references) を用いて [`Tokyo`] へ逆変換する。
@@ -170,11 +108,14 @@ impl Tokyo97 {
         self.degrees
     }
 }
-impl From<Tokyo97> for (f64, f64) {
-    /// 度単位の緯度と経度のペア。
-    /// Latitude and longitude in degrees.
-    fn from(tokyo97: Tokyo97) -> Self {
-        tokyo97.lat_lon().into()
+impl From<LatLon> for Tokyo97 {
+    fn from(degrees: LatLon) -> Self {
+        Self { degrees }
+    }
+}
+impl AsRef<LatLon> for Tokyo97 {
+    fn as_ref(&self) -> &LatLon {
+        &self.degrees
     }
 }
 
@@ -185,23 +126,8 @@ pub struct Jgd2000 {
     degrees: LatLon,
 }
 impl Jgd2000 {
-    /// [`Jgd2000`] から変換する。
-    /// Transform from a coordinate in JGD2000.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use jgd::{LatLon, Jgd2000};
-    ///
-    /// let jgd2000 = LatLon::from_dms((35, 0, 0.0), (135, 0, 0.0));
-    /// let jgd2011 = Jgd2000::new(jgd2000).to_jgd2011().degrees();
-    /// ```
-    ///
-    /// # See also
-    ///
-    /// すでに度単位の座標が分かっている場合は、代わりに [`from_jgd2000`] を使える。
-    pub fn new(degrees: LatLon) -> Self {
-        Self { degrees }
+    pub fn new(lat: f64, lon: f64) -> Self {
+        LatLon::new(lat, lon).into()
     }
 
     /// [`TOUHOKUTAIHEIYOUOKI2011`] を用いて [`Jgd2011`] へ変換する。
@@ -224,20 +150,17 @@ impl Jgd2000 {
     /// Inverse of [`Tokyo97::to_jgd2000`].
     pub fn to_tokyo97(&self) -> Tokyo97 {
         let itrf94 = GRS80.to_ecef(self.degrees) - Tokyo97::TO_ITRF94;
-        Tokyo97::new(BESSEL.to_geodetic(itrf94))
-    }
-
-    /// 緯度経度。
-    /// Latitude and longitude.
-    pub fn degrees(&self) -> LatLon {
-        self.degrees
+        BESSEL.to_geodetic(itrf94).into()
     }
 }
-impl From<Jgd2000> for (f64, f64) {
-    /// 度単位の緯度と経度のペア。
-    /// Latitude and longitude in degrees.
-    fn from(jgd2000: Jgd2000) -> Self {
-        jgd2000.degrees().into()
+impl From<LatLon> for Jgd2000 {
+    fn from(degrees: LatLon) -> Self {
+        Self { degrees }
+    }
+}
+impl AsRef<LatLon> for Jgd2000 {
+    fn as_ref(&self) -> &LatLon {
+        &self.degrees
     }
 }
 
@@ -260,13 +183,6 @@ impl Jgd2011 {
     /// Latitude and longitude.
     pub fn degrees(&self) -> LatLon {
         self.degrees
-    }
-}
-impl From<Jgd2011> for (f64, f64) {
-    /// 度単位の緯度と経度のペア。
-    /// Latitude and longitude in degrees.
-    fn from(jgd2011: Jgd2011) -> Self {
-        jgd2011.degrees().into()
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::LatLon;
+use crate::{Degrees, LatLon};
 
 /// 日本測地系から世界測地系への座標変換パラメータ。
 ///
@@ -47,8 +47,8 @@ impl<'a> Grid<'a> {
         let i = self.search_at(i + 1, mesh.north().east())?;
         let ne_shift = self.dots[i].shift;
 
-        let (n_weight, e_weight) = mesh.diagonal_weight(p).into();
-        let (s_weight, w_weight) = mesh.north().east().diagonal_weight(p).into();
+        let (n_weight, e_weight) = mesh.diagonal_weight(p).degrees();
+        let (s_weight, w_weight) = mesh.north().east().diagonal_weight(p).degrees();
 
         // weighted mean
         let shift = sw_shift.to_degree() * s_weight * w_weight

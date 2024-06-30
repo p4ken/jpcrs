@@ -61,7 +61,7 @@ impl LatLon {
         self.lon
     }
 
-    pub(crate) fn map(mut self, f: impl Fn(f64) -> f64) -> Self {
+    fn map(mut self, f: impl Fn(f64) -> f64) -> Self {
         self.lat = f(self.lat);
         self.lon = f(self.lon);
         self
@@ -95,9 +95,9 @@ impl Div<f64> for LatLon {
         self.map(|x| x / rhs)
     }
 }
-impl From<LatLon> for (f64, f64) {
-    fn from(degree: LatLon) -> Self {
-        (degree.lat, degree.lon)
+impl AsRef<LatLon> for LatLon {
+    fn as_ref(&self) -> &LatLon {
+        self
     }
 }
 

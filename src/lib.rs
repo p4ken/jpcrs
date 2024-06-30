@@ -65,13 +65,15 @@
 mod coord;
 mod crs;
 mod earth;
+mod geodetic;
 mod grid;
 mod island;
 #[cfg(any(feature = "tky2jgd", feature = "patchjgd"))]
 mod par;
 
 pub use coord::LatLon;
-pub use crs::{from_jgd2000, from_tokyo, from_tokyo97, Jgd2000, Jgd2011, Tokyo, Tokyo97};
+pub use crs::{Jgd2000, Jgd2011, Tokyo, Tokyo97};
+pub use geodetic::Degrees;
 pub use grid::Grid;
 #[cfg(feature = "tky2jgd")]
 pub use grid::TKY2JGD;
